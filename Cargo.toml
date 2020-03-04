@@ -11,3 +11,7 @@ clap = "2.32"
 indicatif = "0.14"
 console = "0.9"
 rayon = "1.1"
+ndarray = { version = "0.13", features = ["serde", "rayon", "approx"] }
+ndarray-stats = "0.3"
+approx = "0.3.2"
+noisy_float = "0.1.12"

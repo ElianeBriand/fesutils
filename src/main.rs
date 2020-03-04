@@ -1,11 +1,14 @@
 extern crate clap;
 extern crate rayon;
+extern crate noisy_float;
+extern crate approx;
 
-use clap::{Arg, App, SubCommand, value_t};
+use clap::{Arg, App, SubCommand, value_t, AppSettings};
 
 
 mod error_block;
 mod fes_grid_parser;
+mod fileblock_processing;
 
 
 const VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
@@ -18,6 +21,7 @@ fn main() {
 	println!("v{}\n", VERSION.unwrap_or("ersion unknown"));
 
     let matches = App::new("")
+        .setting(AppSettings::SubcommandRequiredElseHelp)
         .arg(Arg::with_name("Log output")
                  .short("l")
                  .long("log")
@@ -68,6 +72,8 @@ fn main() {
     	let ff_col =  matches.value_of("ff_column").unwrap_or("ff");
 
         error_block::do_error_block(&fesgrid_path_str, &cvwhgt_path_str, &ff_col);
-	}
+	}else {
+
+  }
 
 }
