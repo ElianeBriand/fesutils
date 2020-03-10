@@ -1,7 +1,10 @@
 extern crate clap;
+extern crate num_traits;
 extern crate rayon;
 extern crate noisy_float;
 extern crate approx;
+extern crate csv;
+
 
 use clap::{Arg, App, SubCommand, value_t, AppSettings};
 
@@ -12,6 +15,22 @@ mod fileblock_processing;
 
 
 const VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
+
+
+pub struct GeneralSettings {
+    pub threads_num: usize,
+    pub output_stem: String,
+}
+
+
+impl Default for GeneralSettings {
+    fn default() -> GeneralSettings {
+        GeneralSettings {
+            threads_num: 1,
+            output_stem: "fesutil_output".to_string()
+        }
+    }
+}
 
 
 
@@ -34,6 +53,13 @@ fn main() {
                  .value_name("thread_num")
                  .takes_value(true)
                  .help("Number of thread for parallel processing"))
+        .arg(Arg::with_name("output_stem")
+                 .short("o")
+                 .long("output_stem")
+                 .value_name("output_stem")
+                 .required(false)
+                 .takes_value(true)
+                 .help("Stem for the output filenames (eg: \"output_1\" -> output_1.csv, output_1.dat ... )"))
         .subcommand(SubCommand::with_name("block_error")
                   .about("Run block analysis to compute error bars on a FES")
                   .arg(Arg::with_name("Full FES grid file")
@@ -53,27 +79,45 @@ fn main() {
                       .value_name("ff")
                       .required(false)
                       .help("Name of the column/variable for the free energy in the FES grid. Default to \"ff\""))
+                    .arg(Arg::with_name("output_stem")
+                     .short("o")
+                     .long("output_stem")
+                     .value_name("output_stem")
+                     .required(false)
+                     .takes_value(true)
+                     .help("Stem for the output filenames (eg: \"output_1\" -> output_1.csv, output_1.dat ... )"))
                   )
 
         .get_matches();
 
-    let thr_num = value_t!(matches.value_of("thread_num"), usize).unwrap_or(4); 
+    let mut settings = GeneralSettings {..Default::default()};
+    let thr_num = value_t!(matches.value_of("thread_num"), usize).unwrap_or(1); 
+    settings.threads_num = thr_num;
+
+    let o_stem: String = value_t!(matches.value_of("output_stem"), String).unwrap_or("fesutil_output".to_string()); 
+    settings.output_stem = o_stem;
 
     rayon::ThreadPoolBuilder::new().num_threads(thr_num).build_global().unwrap();
 
     println!("Using {} threads.", thr_num);
 
     if let Some(matches) = matches.subcommand_matches("block_error") {
-    	let fesgrid_path_str =  matches.value_of("Full FES grid file")
-    	.expect("Unexpectedly missing mandatory argument: fesgrid");
-    	let cvwhgt_path_str =  matches.value_of("CV file with frame weight")
-    	.expect("Unexpectedly missing mandatory argument: cvrwhgt");
+        let fesgrid_path_str =  matches.value_of("Full FES grid file")
+        .expect("Unexpectedly missing mandatory argument: fesgrid");
+        let cvwhgt_path_str =  matches.value_of("CV file with frame weight")
+        .expect("Unexpectedly missing mandatory argument: cvrwhgt");
 
-    	let ff_col =  matches.value_of("ff_column").unwrap_or("ff");
+        let o_stem: String = value_t!(matches.value_of("output_stem"), String).unwrap_or("fesutil_output".to_string());
+        if settings.output_stem != "fesutil_output".to_string() {
+            println!("Output stem argument specifies more than once, subcommand argument used. (old value: \"{}\", new value: \"{}\")", settings.output_stem, o_stem);
+        }
+        settings.output_stem = o_stem;
 
-        error_block::do_error_block(&fesgrid_path_str, &cvwhgt_path_str, &ff_col);
-	}else {
+        let ff_col =  matches.value_of("ff_column").unwrap_or("ff");
 
-  }
+        error_block::do_error_block(&settings, &fesgrid_path_str, &cvwhgt_path_str, &ff_col);
+    }else {
+
+    }
 
 }

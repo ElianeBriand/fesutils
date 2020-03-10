@@ -15,3 +15,5 @@ ndarray = { version = "0.13", features = ["serde", "rayon", "approx"] }
 ndarray-stats = "0.3"
 approx = "0.3.2"
 noisy_float = "0.1.12"
+num-traits = "0.2"
+csv = "1.1"
