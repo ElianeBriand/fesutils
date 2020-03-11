@@ -461,7 +461,7 @@ fn read_cvwhgt_file(settings: &GeneralSettings, cvwhgt_path_str: &str, header: &
 
 
 /// Toplevel function for running a error block analysis from required filepath
-pub fn do_error_block(settings: &GeneralSettings, fesgrid_path_str: &str, cvwhgt_path_str: &str, ff_col: &str) {
+pub fn do_error_block(settings: &GeneralSettings, fesgrid_path_str: &str, cvwhgt_path_str: &str) {
     println!("\nFES grid file        : {}", fesgrid_path_str);
     println!("Weighted colvar file : {}", cvwhgt_path_str);
     print!("\n");
@@ -473,6 +473,8 @@ pub fn do_error_block(settings: &GeneralSettings, fesgrid_path_str: &str, cvwhgt
         style("[1/5]").bold().dim()
     );
 	
+    let ref ff_col = settings.ff_column;
+
 	let (header, dims_vec, fes_grid) = fes_grid_parser::fn_parse_fes_grid(fesgrid_path_str, ff_col);
 
 

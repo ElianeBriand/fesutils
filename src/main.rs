@@ -6,12 +6,16 @@ extern crate approx;
 extern crate csv;
 
 
+use crate::fragment_reconstruct::do_fragment_reconstruct;
+
 use clap::{Arg, App, SubCommand, value_t, AppSettings};
 
 
 mod error_block;
 mod fes_grid_parser;
 mod fileblock_processing;
+mod fragment_reconstruct;
+
 
 
 const VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
@@ -20,6 +24,7 @@ const VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
 pub struct GeneralSettings {
     pub threads_num: usize,
     pub output_stem: String,
+    pub ff_column: String
 }
 
 
@@ -27,7 +32,8 @@ impl Default for GeneralSettings {
     fn default() -> GeneralSettings {
         GeneralSettings {
             threads_num: 1,
-            output_stem: "fesutil_output".to_string()
+            output_stem: "fesutil_output".to_string(),
+            ff_column: "ff".to_string()
         }
     }
 }
@@ -74,7 +80,7 @@ fn main() {
                       .value_name("COLVAR.dat")
                       .required(true)
                       .help("File with the CV value for each frame (or stride of frame), with frame weight (output of REWEITH_BIAS, REWEIGHT_METAD ...)"))
-                    .arg(Arg::with_name("ff_column")
+                  .arg(Arg::with_name("ff_column")
                       .long("fes_column_name")
                       .value_name("ff")
                       .required(false)
@@ -87,7 +93,29 @@ fn main() {
                      .takes_value(true)
                      .help("Stem for the output filenames (eg: \"output_1\" -> output_1.csv, output_1.dat ... )"))
                   )
-
+        .subcommand(SubCommand::with_name("fragment_reconstruct")
+                  .about("Reconstruct FES from fragments FES")
+                  .arg(Arg::with_name("Fragment FES grid file")
+                      .short("g")
+                      .long("fesgrid")
+                      .value_name("fesgrid.dat")
+                      .required(true)
+                      .min_values(1)
+                      .help("FES grid for each fragment. Accept multiple argument for multiple fragments."))
+                    .arg(Arg::with_name("Relative conformation file")
+                      .short("c")
+                      .long("conformations")
+                      .value_name("conformations.xyz")
+                      .required(true)
+                      .help("File containing the relative position of the fragment, for multiple conformations."))
+                    .arg(Arg::with_name("output_stem")
+                     .short("o")
+                     .long("output_stem")
+                     .value_name("output_stem")
+                     .required(false)
+                     .takes_value(true)
+                     .help("Stem for the output filenames (eg: \"output_1\" -> output_1.csv, output_1.dat ... )"))
+                  )
         .get_matches();
 
     let mut settings = GeneralSettings {..Default::default()};
@@ -114,9 +142,20 @@ fn main() {
         settings.output_stem = o_stem;
 
         let ff_col =  matches.value_of("ff_column").unwrap_or("ff");
+        settings.ff_column = ff_col.to_string();
 
-        error_block::do_error_block(&settings, &fesgrid_path_str, &cvwhgt_path_str, &ff_col);
-    }else {
+        error_block::do_error_block(&settings, &fesgrid_path_str, &cvwhgt_path_str);
+    }else if let Some(matches) = matches.subcommand_matches("fragment_reconstruct") {
+
+        let fesgrid_paths_str: Vec<&str> = matches.values_of("files")
+        .expect("Unexpectedly missing mandatory argument: --fesgrid : Fragment FES grid file")
+        .collect();
+
+        let rel_conf_path =  matches.value_of("Relative conformation file")
+        .expect("Unexpectedly missing mandatory argument: --conformations : Relative conformation file");
+
+        do_fragment_reconstruct(&settings, fesgrid_paths_str, rel_conf_path);
+    } else {
 
     }
 
