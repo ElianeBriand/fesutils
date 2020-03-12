@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2020 Eliane Briand
+ *
+ * This file is part of fesutils.
+ *
+ * fesutils is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fesutils is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with fesutils.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+#include "PlumedDatHeader.hpp"
+namespace fesutils {
+
+    std::ostream& operator<<(std::ostream& os, const PlumedDatHeader& hd) {
+        os << std::string("Fields: \n");
+
+        for(int i = 0; i< hd.fields.size(); i++) {
+            os << std::string("  [" + std::to_string(i) + "] " + hd.fields[i].name + "\n");
+        }
+
+        return os;
+    }
+
+}
+
