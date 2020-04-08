@@ -26,12 +26,20 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../common/dummy_sink_node.hpp"
+
+namespace f = fesutils;
 
 BOOST_AUTO_TEST_SUITE(misc_ts)
 
 
-    BOOST_AUTO_TEST_CASE(empty_example_tc,* boost::unit_test::timeout(10)) {
-        BOOST_TEST(true == true);
+
+
+    BOOST_AUTO_TEST_CASE(dummy_sink_node_tc,* boost::unit_test::timeout(10)) {
+        f::dummy_sink_node<std::vector<double>> node;
+        std::vector<double> v = {0.0, 1.0, 3.0};
+        bool res = node(v);
+        BOOST_TEST(res);
     }
 
 BOOST_AUTO_TEST_SUITE_END();

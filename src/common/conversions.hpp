@@ -18,30 +18,15 @@
  *
  */
 
-#include "help.hpp"
+#ifndef FESUTILS_CONVERSIONS_HPP
+#define FESUTILS_CONVERSIONS_HPP
 
-#include <boost/log/trivial.hpp>
+#include <string>
+#include <vector>
 
-
-namespace fesutils {
-
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
-
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
-
-        }else {
-
-        }
-         */
-
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
-
-    }
-
-    // LCOV_EXCL_STOP
+inline std::string buffer_to_string(const std::vector<uint8_t>& buffer) {
+    return std::string((char*) buffer.data(), buffer.size());
 }
+
+
+#endif //FESUTILS_CONVERSIONS_HPP

@@ -18,30 +18,30 @@
  *
  */
 
-#include "help.hpp"
+#ifndef FESUTILS_DUMMY_SINK_NODE_HPP
+#define FESUTILS_DUMMY_SINK_NODE_HPP
 
-#include <boost/log/trivial.hpp>
 
 
 namespace fesutils {
 
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
+    template<typename T>
+    class dummy_sink_node {
+    public:
 
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
+        dummy_sink_node() : count(0) {};
 
-        }else {
+        bool operator()(const T& lines);
 
-        }
-         */
+    protected:
+        unsigned int count;
+    };
 
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
 
+    template<typename T>
+    bool dummy_sink_node<T>::operator()(const T& lines) {
+        this->count++;
+        return true;
     }
-
-    // LCOV_EXCL_STOP
 }
+#endif //FESUTILS_DUMMY_SINK_NODE_HPP

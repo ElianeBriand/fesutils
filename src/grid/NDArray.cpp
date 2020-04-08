@@ -18,30 +18,4 @@
  *
  */
 
-#include "help.hpp"
-
-#include <boost/log/trivial.hpp>
-
-
-namespace fesutils {
-
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
-
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
-
-        }else {
-
-        }
-         */
-
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
-
-    }
-
-    // LCOV_EXCL_STOP
-}
+#include "NDArray.hpp"

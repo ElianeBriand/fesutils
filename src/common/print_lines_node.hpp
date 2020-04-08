@@ -18,30 +18,25 @@
  *
  */
 
-#include "help.hpp"
+#ifndef FESUTILS_PRINT_LINES_NODE_HPP
+#define FESUTILS_PRINT_LINES_NODE_HPP
 
-#include <boost/log/trivial.hpp>
-
+#include <string>
+#include <vector>
 
 namespace fesutils {
+    class print_lines_node {
+    public:
 
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
+        explicit print_lines_node(const std::string& prefix);
 
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
+        bool operator()(const std::vector<std::string>& lines);
 
-        }else {
-
-        }
-         */
-
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
-
-    }
-
-    // LCOV_EXCL_STOP
+    protected:
+        std::string prefix;
+    };
 }
+
+
+
+#endif //FESUTILS_PRINT_LINES_NODE_HPP

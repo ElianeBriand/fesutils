@@ -17,31 +17,27 @@
  * along with fesutils.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-#include "help.hpp"
+#include "print_lines_node.hpp"
 
 #include <boost/log/trivial.hpp>
 
+// LCOV_EXCL_START
+// Reason for coverage exclusion: not unit testing pure io
 
-namespace fesutils {
+fesutils::print_lines_node::print_lines_node(const std::string& prefix) {
 
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
-
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
-
-        }else {
-
-        }
-         */
-
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
-
-    }
-
-    // LCOV_EXCL_STOP
 }
+
+
+
+bool fesutils::print_lines_node::operator()(const std::vector<std::string>& lines) {
+    if (lines.empty())
+        return false;
+    for(const auto& line: lines) {
+        BOOST_LOG_TRIVIAL(info) << this->prefix << line;
+    }
+    return true;
+}
+
+
+// LCOV_EXCL_STOP

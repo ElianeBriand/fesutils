@@ -23,7 +23,8 @@
 
 #include <vector>
 #include <string>
-
+#include <map>
+#include <variant>
 
 namespace fesutils {
 
@@ -36,6 +37,8 @@ namespace fesutils {
         bool is_subcomponent = false;
         std::string basename;
         std::string subfield;
+
+        std::map<std::string, std::variant<bool, int, double>> attributes;
 
         Field() = default;
     };

@@ -3,9 +3,8 @@ set -ev
 
 THREAD=1
 SEND=1
-LOCAL=0
 
-while getopts t:s:l: option
+while getopts t:s: option
 do
 case "${option}"
 in

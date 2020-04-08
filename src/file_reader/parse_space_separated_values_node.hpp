@@ -18,30 +18,36 @@
  *
  */
 
-#include "help.hpp"
+#ifndef FESUTILS_PARSE_SPACE_SEPARATED_VALUES_NODE_HPP
+#define FESUTILS_PARSE_SPACE_SEPARATED_VALUES_NODE_HPP
 
-#include <boost/log/trivial.hpp>
 
+#include <vector>
+#include <string>
+#include <memory>
+#include <Eigen/Dense>
 
 namespace fesutils {
 
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
+    class parse_space_separated_double_node {
+    public:
 
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
+        explicit parse_space_separated_double_node(size_t num_cols);
 
-        }else {
+        std::shared_ptr<Eigen::Array<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>
+            operator()(const std::shared_ptr<std::vector<std::string>> lines_sptr);
 
-        }
-         */
+    protected:
 
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
+        size_t num_columns;
 
-    }
+        size_t processed_count;
+        size_t error_count;
 
-    // LCOV_EXCL_STOP
+        size_t dbg_call_to_operator;
+    };
 }
+
+
+
+#endif //FESUTILS_PARSE_SPACE_SEPARATED_VALUES_NODE_HPP

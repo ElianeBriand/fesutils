@@ -24,15 +24,39 @@
 #include <vector>
 #include <string>
 
+
 namespace fesutils {
 
     /**
      * Extract comma-separated float value from string
      *
+     * [SLOW] : do not use in main path
+     *
      * \param str comma separated float values
      * \return vector of extracted values
      */
     std::vector<float> extract_range_from_string(const std::string& str);
+
+    /** Split a line into space separated tokens.
+     *
+     * [SLOW] : do not use in main path
+     *
+     * \param line line to tokenize
+     * \return vector of tokens
+     */
+    std::vector<std::string> slow_tokenize(const std::string& line);
+
+    /**
+     * Parse "false" and "true" to bool
+     *
+     * String should already be trimmed. eg: "false " will make it throw.
+     *
+     * [SLOW] : do not use in main path
+     *
+     * \param s value to parse
+     * \return
+     */
+    bool parse_bool_as_word(const std::string& s);
 
 }
 

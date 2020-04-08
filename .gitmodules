@@ -1,0 +1,6 @@
+[submodule "bundled-deps/indicators"]
+	path = bundled-deps/indicators
+	url = https://github.com/p-ranav/indicators
+[submodule "bundled-deps/fmt"]
+	path = bundled-deps/fmt
+	url = https://github.com/fmtlib/fmt.git

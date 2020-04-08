@@ -22,12 +22,12 @@
 
 
 #include <boost/log/trivial.hpp>
-
+#include <boost/tokenizer.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
 
 namespace qi = boost::spirit::qi;
 namespace phoenix = boost::phoenix;
+namespace b = boost;
 
 namespace fesutils {
 
@@ -44,6 +44,31 @@ namespace fesutils {
 
         return range;
     }
+
+
+    std::vector<std::string> slow_tokenize(const std::string& line) {
+        std::vector<std::string> tokens;
+
+        b::char_separator<char> sep(" ");
+        b::tokenizer<b::char_separator<char>> tok(line, sep);
+        for(auto beg=tok.begin(); beg!=tok.end();++beg){
+            tokens.push_back(*beg);
+        }
+
+        return tokens;
+    }
+
+    bool parse_bool_as_word(const std::string& s) {
+        if(s == "true") {
+            return true;
+        }
+        if(s == "false") {
+            return false;
+        }
+        throw std::runtime_error("Encountered unparseable boolean value: " + s + " (Error code 00002)");
+        return false;
+    }
+
 
 }
 

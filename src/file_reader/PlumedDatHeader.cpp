@@ -20,15 +20,26 @@
 #include "PlumedDatHeader.hpp"
 namespace fesutils {
 
+    // LCOV_EXCL_START
+    // Reason for coverage exclusion: purely console printing function
+
     std::ostream& operator<<(std::ostream& os, const PlumedDatHeader& hd) {
         os << std::string("Fields: \n");
 
         for(int i = 0; i< hd.fields.size(); i++) {
             os << std::string("  [" + std::to_string(i) + "] " + hd.fields[i].name + "\n");
+            os << std::string("     Attrs: ") +  "\n";
+            for(auto it = hd.fields[i].attributes.begin(); it != hd.fields[i].attributes.end(); it++) {
+                std::string val_str;
+                std::visit([&val_str](auto&& arg){val_str = std::to_string(arg);}, it->second);
+                os << (std::string("             [\"") + it->first + std::string("\"] = ") + val_str + "\n");
+            }
         }
 
         return os;
     }
+
+    // LCOV_EXCL_STOP
 
 }
 

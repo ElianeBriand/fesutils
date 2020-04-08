@@ -18,30 +18,29 @@
  *
  */
 
-#include "help.hpp"
+#define BOOST_TEST_DYN_LINK
 
-#include <boost/log/trivial.hpp>
+#include <vector>
+#include <iostream>
 
+#include <tbb/flow_graph.h>
 
-namespace fesutils {
+#include <boost/test/unit_test.hpp>
 
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: purely console printing function
+#include "../../common/limiter_decrementer_node.hpp"
 
-    void do_help(const std::string& command) {
-        /*
-        if(command == "final_bias_reweight")  {
+namespace f = fesutils;
 
-        }else {
+BOOST_AUTO_TEST_SUITE(misc_ts)
 
-        }
-         */
+    BOOST_AUTO_TEST_CASE(limiter_decrementer_tc) {
+       f::limiter_decrementer_node<int> n;
 
-        BOOST_LOG_TRIVIAL(info) << "See documentation for detailed help.";
-        BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
-        BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
+       int message= 0;
+       tbb::flow::continue_msg res = n(message);
+       BOOST_TEST(true); // Nothing to test, but if we reach here the limiter_decrementer node works
 
     }
 
-    // LCOV_EXCL_STOP
-}
+
+BOOST_AUTO_TEST_SUITE_END();

@@ -104,6 +104,8 @@ int main(int argc, char** argv) {
                     ("outfile", po::value<std::string>(), "File to output the CV alongside their computed weight.")
                     ("metadgrid", po::value<std::string>(),
                      "File with the MetaD grid potential, typically dumped with WGRID_FILE")
+                    ("biasfield", po::value<std::string>(),
+                     "Name of the field corresponding to the bias value")
                     ("ranges_min", po::value<std::string>(),
                      "Minimal threhold value of the variable for the frame to be considered. Can be multiple values: 0.0,1.2,3.1.")
                     ("ranges_max", po::value<std::string>(),
@@ -124,22 +126,21 @@ int main(int argc, char** argv) {
                 BOOST_LOG_TRIVIAL(error) << fbw_desc;
 
             }else {
-                std::string ranges_min_rawstr;
-                std::string ranges_max_rawstr;
+                f::final_bias_reweight_args args;
 
                 if(vm.count("ranges_min")) {
-                    ranges_min_rawstr = vm["ranges_min"].as<std::string>();
+                    args.ranges_min_rawstr = vm["ranges_min"].as<std::string>();
                 }
 
                 if(vm.count("ranges_max")) {
-                    ranges_max_rawstr = vm["ranges_min"].as<std::string>();
+                    args.ranges_max_rawstr = vm["ranges_min"].as<std::string>();
                 }
 
-                std::string cvfile_path = vm["cvfile"].as<std::string>();
+                args.cvfile_path = vm["cvfile"].as<std::string>();
 
-                std::string metadgrid_path = vm["metadgrid"].as<std::string>();
+                args.metadgrid_path = vm["metadgrid"].as<std::string>();
 
-                f::do_final_bias_reweight(options, cvfile_path, metadgrid_path, ranges_min_rawstr, ranges_max_rawstr);
+                f::do_final_bias_reweight(options, args);
 
                 return 0;
             }

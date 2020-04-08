@@ -25,9 +25,11 @@
 #include <cstdio>
 #include <cstdlib>
 
+
 #include <boost/test/unit_test.hpp>
 
 #include "../../file_reader/read_file_header.hpp"
+#include "../TempTextFile.hpp"
 
 namespace f = fesutils;
 
@@ -41,30 +43,16 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
     BOOST_AUTO_TEST_CASE(read_cv_file_header_existent_tc) {
 
+        const std::string filecontent = "#! FIELDS aaa bbb.dd\n"
+                                        "# OtherHeaderField\n"
+                                        "0.112 0.12\n"
+                                        "-1.4 0.0e-3\n"
+                                        "inf 0.2\n"
+                                        "2 nan\n";
 
+        TempTextFile tempFile(filecontent);
 
-        #ifdef __linux__
-                char namebuf[strlen("test.XXXXXX") + 1];
-                std::strcpy(namebuf,"test.XXXXXX");
-                std::FILE* tmpf = fdopen(mkstemp(namebuf), "wb");
-                std::string name1 = namebuf;
-        #else
-                std::string name1 = std::tmpnam(nullptr);
-                std::FILE* tmpf = std::fopen(name1.c_str(), "wb");
-        #endif
-
-        BOOST_REQUIRE(tmpf != nullptr);
-
-        std::fputs("#! FIELDS aaa bbb.dd\n"
-                   "# OtherHeaderField\n"
-                   "0.112 0.12\n"
-                   "-1.4 0.0e-3\n"
-                   "inf 0.2\n"
-                   "2 nan\n", tmpf);
-
-        std::fflush(tmpf);
-
-        f::PlumedDatHeader header = f::read_cv_file_header(name1);
+        f::PlumedDatHeader header = f::read_cv_file_header(tempFile.getName());
 
         BOOST_TEST(header.fields.size() == 2);
         BOOST_REQUIRE(header.fields.size() == 2);
@@ -77,9 +65,6 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
         BOOST_TEST(header.fields[1].basename == "bbb");
         BOOST_TEST(header.fields[1].subfield == "dd");
-
-        std::fclose(tmpf);
-        std::remove(name1.c_str());
 
     }
 
@@ -120,10 +105,6 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
         f::PlumedDatHeader header;
         f::parse_FIELDS_line(header, "#! FIELDS a b.d c..d");
 
-        for(auto& e: header.fields) {
-            std::cout << e.name << std::endl;
-        }
-
         BOOST_TEST(header.fields.size() == 3);
         BOOST_REQUIRE(header.fields.size() == 3);
 
@@ -143,5 +124,95 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
     }
 
+    BOOST_AUTO_TEST_CASE(parse_SET_line_tc) {
 
-BOOST_AUTO_TEST_SUITE_END();
+        {
+            f::PlumedDatHeader header;
+            f::parse_FIELDS_line(header, "#! FIELDS a b.d c..d");
+
+            f::parse_SET_line(header, "#! SET min_a 2.4");
+
+            BOOST_TEST(header.fields.size() == 3);
+            BOOST_REQUIRE(header.fields.size() == 3);
+
+            BOOST_REQUIRE(header.fields[0].name == "a");
+
+            BOOST_TEST(header.fields[0].attributes.size() == 1);
+            BOOST_REQUIRE(header.fields[0].attributes.size() == 1);
+            BOOST_REQUIRE(std::holds_alternative<double>(header.fields[0].attributes["min"]));
+            BOOST_TEST(std::get<double>(header.fields[0].attributes["min"]) == 2.4);
+
+            BOOST_CHECK_THROW( std::get<bool>(header.fields[0].attributes["min"]), std::bad_variant_access );
+            BOOST_CHECK_THROW( std::get<double>(header.fields[0].attributes["map"]), std::bad_variant_access );
+        }
+
+        {
+            f::PlumedDatHeader header;
+            f::parse_FIELDS_line(header, "#! FIELDS a b.d c..d");
+
+            // Unknown attribute should not in be added to the map
+            f::parse_SET_line(header, "#! SET moop_a 2.4");
+
+
+            BOOST_REQUIRE(header.fields[0].name == "a");
+
+            BOOST_TEST(header.fields[0].attributes.size() == 0);
+
+            // Testing int attribute
+            f::parse_SET_line(header, "#! SET nbins_a 523");
+
+            BOOST_TEST(header.fields[0].attributes.size() == 1);
+            BOOST_REQUIRE(header.fields[0].attributes.size() == 1);
+            BOOST_REQUIRE(std::holds_alternative<int>(header.fields[0].attributes["nbins"]));
+            BOOST_TEST(std::get<int>(header.fields[0].attributes["nbins"]) == 523);
+
+            // Testing bool attribute
+            f::parse_SET_line(header, "#! SET periodic_a false");
+
+            BOOST_TEST(header.fields[0].attributes.size() == 2);
+            BOOST_REQUIRE(header.fields[0].attributes.size() == 2);
+            BOOST_REQUIRE(std::holds_alternative<bool>(header.fields[0].attributes["periodic"]));
+            BOOST_TEST(std::get<bool>(header.fields[0].attributes["periodic"]) == false);
+
+        }
+
+        {
+            f::PlumedDatHeader header;
+            f::parse_FIELDS_line(header, "#! FIELDS a b.d c..d");
+
+            // Malformed line: too short
+            BOOST_CHECK_THROW(f::parse_SET_line(header, "#! SET min_a"), std::runtime_error );
+
+            // Should be double, but is bool: should throw
+            BOOST_CHECK_THROW(f::parse_SET_line(header, "#! SET min_a false"), std::runtime_error );
+
+            // Should be int, but is double: should throw
+            BOOST_CHECK_THROW(f::parse_SET_line(header, "#! SET nbins_a 2.8"), std::runtime_error );
+
+            // Should be bool, but is double: should throw
+            BOOST_CHECK_THROW(f::parse_SET_line(header, "#! SET periodic_a 2.8"), std::runtime_error );
+
+        }
+
+    }
+
+    BOOST_AUTO_TEST_CASE(extract_attribute_field_from_attrfield_tc) {
+
+        {
+            std::tuple<std::string, std::string> res = f::extract_attribute_field_from_attrfield("attri_varname");
+
+            BOOST_TEST(std::get<0>(res) == "attri");
+            BOOST_TEST(std::get<1>(res) == "varname");
+        }
+
+        BOOST_CHECK_THROW( f::extract_attribute_field_from_attrfield("nounderscore"), std::runtime_error );
+        BOOST_CHECK_THROW( f::extract_attribute_field_from_attrfield("emptyvarname_"), std::runtime_error );
+        BOOST_CHECK_THROW( f::extract_attribute_field_from_attrfield("_emptyattribute"), std::runtime_error );
+
+    }
+
+
+
+
+
+    BOOST_AUTO_TEST_SUITE_END();

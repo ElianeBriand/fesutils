@@ -22,11 +22,21 @@
 #define FESUTILS_FINAL_BIAS_REWEIGHT_HPP
 
 #include <string>
+#include <boost/optional.hpp>
 
 #include "../GeneralOptions.h"
 
 
 namespace fesutils {
+
+    struct final_bias_reweight_args {
+        std::string cvfile_path;
+        std::string metadgrid_path;
+        std::string ranges_min_rawstr;
+        std::string ranges_max_rawstr;
+
+        std::optional<std::string> biasfield;
+    };
 
     /**
      * Entry point for the final_bias_reweight subcommand.
@@ -38,10 +48,7 @@ namespace fesutils {
      * \param ranges_max_rawstr Maximal value for the CV (empty string if not passed)
      */
     void do_final_bias_reweight(GeneralOptions& options,
-                                const std::string& cvfile_path,
-                                const std::string& metadgrid_path,
-                                const std::string& ranges_min_rawstr,
-                                const std::string& ranges_max_rawstr);
+                                const final_bias_reweight_args& args);
 
 }
 

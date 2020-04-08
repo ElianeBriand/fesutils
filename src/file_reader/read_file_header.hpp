@@ -1,6 +1,22 @@
-//
-// Created by eliane on 20/03/2020.
-//
+/*
+ * Copyright (c) 2020 Eliane Briand
+ *
+ * This file is part of fesutils.
+ *
+ * fesutils is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fesutils is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with fesutils.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef FESUTILS_READ_CV_FILE_HEADER_HPP
 #define FESUTILS_READ_CV_FILE_HEADER_HPP
@@ -27,6 +43,13 @@ namespace fesutils {
      */
     void parse_FIELDS_line(PlumedDatHeader& header, const std::string& line);
 
+    /** Extract information related to fields from the corresponding header line
+     * PRECONDITION: line starts with "#! SET "
+     * \param header PlumedDatHeader to fill
+     * \param line line to extract fields from
+     */
+    void parse_SET_line(PlumedDatHeader& header, const std::string& line);
+
     /**
      * Extract the components of a "basename.subfield" field name. Does not support multiple levels (basename.subfield.subfield)
      * or empty subfield: in these cases, return whole field as basename.
@@ -35,6 +58,16 @@ namespace fesutils {
      * \return tuple of (basename, subfield)
      */
     std::tuple<std::string, std::string> extract_basename_subfield_from_field_name(const std::string& field);
+
+    /**
+     * Extract the attribute name, and the field name from a "attrribute_fieldname" attribute field.
+     *
+     * \param attrfield
+     * \return tuple of (attribute name, field name)
+     */
+    std::tuple<std::string, std::string> extract_attribute_field_from_attrfield(const std::string& attrfield);
+
+
 }
 
 

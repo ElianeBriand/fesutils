@@ -20,15 +20,24 @@ addons:
       - lcov
       # - libtbb-dev
       - wget
+
 install:
-#  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+  - travis_retry wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.tar.gz
+  - echo "85f55f13c922c853049edcf37c828b02b9b2fc00729d0cbb56cf20181a39340b *cmake-3.16.0-Linux-x86_64.tar.gz" > cmake_sha256.txt
+  - sha256sum -c cmake_sha256.txt
+  - tar -xf cmake-3.16.0-Linux-x86_64.tar.gz
+  - mv cmake-3.16.0-Linux-x86_64 cmake-install
+  - PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH
+  - cd ${TRAVIS_BUILD_DIR}
 script:
   - export PYTHON_EXECUTABLE=`which python3`
   - export PYTHON_INCLUDE_DIR=$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")
   - export PYTHON_LIBRARY=$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug ..
   - make
   - ctest --verbose
   - cd ..
