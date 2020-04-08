@@ -54,13 +54,13 @@ BOOST_AUTO_TEST_SUITE(parse_space_separated_values_ts)
         BOOST_TEST((*res)(0,2) == -1.2);
         BOOST_TEST((*res)(0,3) == 0.0);
         BOOST_TEST((*res)(1,0) == 0.0);
-        BOOST_TEST((*res)(1,1) == std::numeric_limits<double>::infinity());
+        BOOST_TEST(std::isinf((*res)(1,1)));
         BOOST_TEST((*res)(1,2) == 8.4e10);
         BOOST_TEST((*res)(1,3) == 12);
         BOOST_TEST((*res)(2,0) == -1);
         BOOST_TEST((*res)(2,1) == 3.33);
         BOOST_TEST((*res)(2,2) == 4.0);
-        BOOST_TEST((*res)(2,3) != (*res)(2,3));
+        BOOST_TEST(std::isnan((*res)(2,3)));
     }
 
     BOOST_AUTO_TEST_CASE(parse_space_separated_double_node_lotsofdata_tc, *boost::unit_test::tolerance(0.001)) {
