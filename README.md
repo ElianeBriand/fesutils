@@ -10,16 +10,20 @@ While some of this can be done with Plumed itself, the specialisation of this to
 
 
 # Build
-Initialise submodules and cmake build:
+Initialise submodules:
 ```
 git submodule update --init --recursive
 ```
 
-Build `fmt` (tensor compiler):
+Build dependencies (`fmt` & `indicators`):
 ```
 cd bundled-deps
 mkdir build-fmt && cd build-fmt
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../fmt
+make && make install
+cd ..
+mkdir build-indicators && cd build-indicators
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../indicators
 make && make install
 cd ../..
 ```
@@ -33,10 +37,12 @@ make
 
 # Dependencies:
 
-- Boost
-- Eigen
-- Threading Building Block (intel tbb)
+Must be installed:
+- Boost >1.67
+- Eigen 3
+- Threading Building Block (Intel tbb)
 
-- indicator (bundled in submodule)
-
+Bundled-in submodules:
+- indicator
+- fmt
 

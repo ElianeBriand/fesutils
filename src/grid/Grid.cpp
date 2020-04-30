@@ -21,6 +21,8 @@
 
 #include "Grid.hpp"
 
+#include <fstream>
+
 #include <boost/log/trivial.hpp>
 
 
@@ -71,6 +73,64 @@ namespace fesutils {
         os << "\n" ;
 
         return os;
+    }
+
+    bool Grid::dump_binrepr_to_file(const std::string& filename) {
+        std::ofstream outfile(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+        if(outfile.is_open()) {
+            outfile.write(reinterpret_cast<char*>(&(this->num_dims)), sizeof(this->num_dims));
+            size_t total_length = 1;
+            for(size_t i = 0; i < this->num_dims; i++) {
+                long int dim_length = this->dims.at(i);
+                total_length *= dim_length;
+                outfile.write(reinterpret_cast<char*>(&dim_length), sizeof(dim_length));
+            }
+            outfile.write(reinterpret_cast<const char*>(this->grid_array->get_raw_data_ptr()), total_length * sizeof(double));
+            outfile.close();
+            return true;
+        }
+        else {
+            BOOST_LOG_TRIVIAL(error) << "Cannot open file " << filename << "for dumping grid data.";
+            return false;
+        }
+        return false;
+    }
+
+    bool Grid::load_binrepr_from_file(const std::string& filename) {
+        std::ifstream infile(filename, std::ios::in | std::ios::binary);
+        if(infile.is_open()) {
+            size_t dims_count = 0;
+            infile.read(reinterpret_cast<char*>(&dims_count), sizeof(dims_count));
+            std::vector<long int> dimensions_size;
+            for(size_t i = 0; i < dims_count; i++) {
+                long int curr_dim = 0;
+                infile.read(reinterpret_cast<char*>(&curr_dim), sizeof(curr_dim));
+                dimensions_size.push_back(curr_dim);
+            }
+            if(dims_count != this->num_dims) {
+                BOOST_LOG_TRIVIAL(error) << "Mismatching dimension in binary dump: expected" << this->num_dims << " but got " << dims_count;
+                return false;
+            }
+            size_t total_length = 1;
+            for(size_t i = 0; i < dims_count; i++) {
+                if(dimensions_size.at(i) != this->dims.at(i)) {
+                    BOOST_LOG_TRIVIAL(error) << "Mismatching dimension size in binary dump: expected" << this->dims.at(i) << " but got " << dimensions_size.at(i) << " at index " << i;
+                    return false;
+                }
+                total_length *= dimensions_size.at(i);
+            }
+            char* data_ptr = this->grid_array->get_raw_data_ptr();
+            infile.read(data_ptr, total_length *  sizeof(double));
+            if(infile.fail()) {
+                BOOST_LOG_TRIVIAL(error) << "Binary dump was not long enough: expected " << total_length *  sizeof(double) << " bytes";
+                return false;
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+        return false;
     }
 
     // LCOV_EXCL_STOP

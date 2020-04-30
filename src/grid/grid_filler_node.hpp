@@ -18,34 +18,37 @@
  *
  */
 
-#ifndef FESUTILS_PARSE_SPACE_SEPARATED_VALUES_NODE_HPP
-#define FESUTILS_PARSE_SPACE_SEPARATED_VALUES_NODE_HPP
+#ifndef FESUTILS_GRID_FILLER_NODE_HPP
+#define FESUTILS_GRID_FILLER_NODE_HPP
 
-
-#include <vector>
-#include <string>
 #include <memory>
+#include <vector>
+
 #include <Eigen/Dense>
+#include <tbb/flow_graph.h>
+
+#include "Grid.hpp"
+
 
 namespace fesutils {
-
-    class parse_space_separated_double_node {
+    class grid_filler_node {
     public:
 
-        explicit parse_space_separated_double_node(size_t num_cols);
+        explicit grid_filler_node(std::shared_ptr<Grid> grid_, size_t grid_value_idx_);
 
-        std::shared_ptr<Eigen::Array<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>
-            operator()(const std::shared_ptr<std::vector<std::string>> lines_sptr);
+        tbb::flow::continue_msg operator()(const std::shared_ptr<Eigen::Array<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> data);
 
     protected:
-        size_t num_columns;
+        std::shared_ptr<Grid> grid;
+        size_t grid_value_idx;
 
-        size_t processed_count;
-        size_t error_count;
+    private:
+        std::vector<double> coord_buffer;
+        std::vector<long int> indexes_buffer;
 
     };
 }
 
 
 
-#endif //FESUTILS_PARSE_SPACE_SEPARATED_VALUES_NODE_HPP
+#endif //FESUTILS_GRID_FILLER_NODE_HPP

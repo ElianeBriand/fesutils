@@ -110,6 +110,21 @@ BOOST_AUTO_TEST_SUITE(grid_utils_ts)
 
     }
 
+    BOOST_AUTO_TEST_CASE(find_bias_tc) {
+        MiscFixture fixture;
+
+        std::optional<size_t> likely_bias = find_likely_bias_field_index(fixture.dummy_header);
+        BOOST_TEST(likely_bias.has_value());
+        BOOST_REQUIRE(likely_bias.has_value());
+        BOOST_TEST(likely_bias.value() == fixture.index_bias_field);
+
+        fixture.dummy_header.fields.back().name = "var3nonbias";
+
+        likely_bias = find_likely_bias_field_index(fixture.dummy_header);
+        BOOST_TEST(!likely_bias.has_value());
+
+    }
+
     BOOST_AUTO_TEST_CASE(compute_grid_bin_edges_tc) {
         MiscFixture fixture;
 

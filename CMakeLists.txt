@@ -4,6 +4,19 @@ project(fesutils)
 
 set(CMAKE_CXX_STANDARD 17)
 
+option(SANITIZER_BUILD "Enable UB and adress sanitizer." OFF)
+set(SANITIZER_BUILD 0)
+
+if(SANITIZER_BUILD)
+    message("Sanitizer build enabled")
+    SET (CMAKE_CXX_COMPILER             "clang")
+    SET (CMAKE_CXX_COMPILER             "clang++")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
+    set (CMAKE_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
+else()
+    message("Sanitizer build disabled")
+endif()
+
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -86,7 +99,7 @@ set(SOURCE_LIST src/GeneralOptions.cpp
                 src/grid/grid_utils.cpp
                 src/grid/grid_utils.hpp
                 src/grid/Grid.cpp
-                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp)
+                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp src/grid/grid_filler_node.cpp src/grid/grid_filler_node.hpp src/progress/progress_printer.cpp src/progress/progress_printer.hpp src/progress/progress_printer_nodes.hpp)
 
 set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt)
 
@@ -98,12 +111,13 @@ target_link_libraries(fesutils  ${LIBRARY_LINK_LIST})
 
 target_compile_options(fesutils PRIVATE -Wno-ignored-attributes)
 
+if(NOT SANITIZER_BUILD)
 target_precompile_headers(fesutils
         PUBLIC
         ${PCH_HEADER_LIST}
         ${PCH_SYST_HEADER_LIST}
         )
-
+endif()
 
 add_custom_command(
         TARGET fesutils POST_BUILD
@@ -121,7 +135,7 @@ set(TEST_SOURCE_LIST
         src/unit_tests/file_reader/read_file_ts.cpp
         src/unit_tests/TempTextFile.hpp
         src/unit_tests/TempTextFile.cpp
-        src/unit_tests/file_reader/parse_space_separated_values_ts.cpp src/unit_tests/grid/grid_utils_ts.cpp src/unit_tests/grid/grid_ts.cpp src/unit_tests/MiscFixture.cpp src/unit_tests/MiscFixture.hpp src/grid/NDArray.cpp src/grid/NDArray.hpp src/unit_tests/grid/ndarray_ts.cpp src/unit_tests/common/misc_ts.cpp)
+        src/unit_tests/file_reader/parse_space_separated_values_ts.cpp src/unit_tests/grid/grid_utils_ts.cpp src/unit_tests/grid/grid_ts.cpp src/unit_tests/MiscFixture.cpp src/unit_tests/MiscFixture.hpp src/grid/NDArray.cpp src/grid/NDArray.hpp src/unit_tests/grid/ndarray_ts.cpp src/unit_tests/common/misc_ts.cpp src/unit_tests/grid/grid_filler_node_ts.cpp src/unit_tests/progress/progress_printer_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})
@@ -129,11 +143,14 @@ target_compile_definitions(complete_test_suite PUBLIC BOOST_LOG_DYN_LINK)
 
 target_link_libraries(complete_test_suite ${LIBRARY_LINK_LIST})
 
-target_precompile_headers(complete_test_suite
-        PUBLIC
-        ${PCH_HEADER_LIST}
-        ${PCH_SYST_HEADER_LIST}
-        )
+if(NOT SANITIZER_BUILD)
+    target_precompile_headers(complete_test_suite
+            PUBLIC
+            ${PCH_HEADER_LIST}
+            ${PCH_SYST_HEADER_LIST}
+            )
+endif()
+
 
 target_compile_options(complete_test_suite PRIVATE -Wno-ignored-attributes)
 

@@ -39,11 +39,12 @@ MiscFixture::MiscFixture() {
     expected_grid_bin_centers.push_back(std::move(field2_centers));
 
     f::Field field3;
-    field2.name = "varname3";
+    field3.name = "varname3.bias";
 
     this->dummy_header.fields.push_back(field1);
     this->dummy_header.fields.push_back(field2);
     this->dummy_header.fields.push_back(field3);
+    this->index_bias_field = 2;
 
     expected_grid_field_indexes.push_back(0);
     expected_grid_field_indexes.push_back(1);
@@ -59,7 +60,7 @@ MiscFixture::MiscFixture() {
 
     coord_vect = {3.7,  3.7};
     example_coordinates_inside_grid.push_back(coord_vect);
-    examples_value.push_back(0.0);
+    examples_value.push_back(0.1);
 
     coord_vect = {-8.3,  12.4};
     example_coordinates_outside_grid.push_back(coord_vect);

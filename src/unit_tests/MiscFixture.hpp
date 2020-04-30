@@ -19,6 +19,7 @@ struct MiscFixture {
     f::PlumedDatHeader dummy_header;
 
     size_t expected_num_grid_fields;
+    size_t index_bias_field;
     std::vector<size_t> expected_grid_field_indexes;
     std::vector<size_t> expected_grid_dims;
     std::vector<double> expected_grid_min_vals;

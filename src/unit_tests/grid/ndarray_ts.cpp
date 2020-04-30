@@ -245,6 +245,53 @@ BOOST_AUTO_TEST_SUITE(ndarray_ts)
 
     }
 
+    BOOST_AUTO_TEST_CASE(raw_ptr_tc) {
+
+        const long int dimension_size = 3;
+        double targetValue = 123.1;
+        std::vector<long int> indexes;
+
+        std::vector<double> reference_data(dimension_size*dimension_size*dimension_size*dimension_size, targetValue);
+        int memcmp_res = 0;
+
+        std::shared_ptr<f::NDArray<double>> oneD =  f::NDArray_factory<double>(std::vector<long int>(1, dimension_size));
+        oneD->zeroOut();
+        oneD->setAllToValue(targetValue);
+        size_t bytelength_ref = dimension_size * sizeof(double);
+        BOOST_TEST(bytelength_ref == oneD->get_raw_data_bytelength());
+        BOOST_REQUIRE(bytelength_ref == oneD->get_raw_data_bytelength());
+        memcmp_res = std::memcmp(oneD->get_raw_data_ptr(), (char*) reference_data.data(), bytelength_ref);
+        BOOST_TEST(memcmp_res == 0);
+
+        std::shared_ptr<f::NDArray<double>> twoD =  f::NDArray_factory<double>(std::vector<long int>(2, dimension_size));
+        twoD->zeroOut();
+        twoD->setAllToValue(targetValue);
+        bytelength_ref = dimension_size * dimension_size * sizeof(double);
+        BOOST_TEST(bytelength_ref == twoD->get_raw_data_bytelength());
+        BOOST_REQUIRE(bytelength_ref == twoD->get_raw_data_bytelength());
+        memcmp_res = std::memcmp(twoD->get_raw_data_ptr(), (char*) reference_data.data(), bytelength_ref);
+        BOOST_TEST(memcmp_res == 0);
+
+
+        std::shared_ptr<f::NDArray<double>> threeD =  f::NDArray_factory<double>(std::vector<long int>(3, dimension_size));
+        threeD->zeroOut();
+        threeD->setAllToValue(targetValue);
+        bytelength_ref = dimension_size * dimension_size * dimension_size * sizeof(double);
+        BOOST_TEST(bytelength_ref == threeD->get_raw_data_bytelength());
+        BOOST_REQUIRE(bytelength_ref == threeD->get_raw_data_bytelength());
+        memcmp_res = std::memcmp(threeD->get_raw_data_ptr(), (char*) reference_data.data(), bytelength_ref);
+        BOOST_TEST(memcmp_res == 0);
+
+        std::shared_ptr<f::NDArray<double>> fourD =  f::NDArray_factory<double>(std::vector<long int>(4, dimension_size));
+        fourD->zeroOut();
+        fourD->setAllToValue(targetValue);
+        bytelength_ref = dimension_size * dimension_size * dimension_size * dimension_size * sizeof(double);
+        BOOST_TEST(bytelength_ref == fourD->get_raw_data_bytelength());
+        BOOST_REQUIRE(bytelength_ref == fourD->get_raw_data_bytelength());
+        memcmp_res = std::memcmp(fourD->get_raw_data_ptr(), (char*) reference_data.data(), bytelength_ref);
+        BOOST_TEST(memcmp_res == 0);
+
+    }
 
 
 BOOST_AUTO_TEST_SUITE_END();

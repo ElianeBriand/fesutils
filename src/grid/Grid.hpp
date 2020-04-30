@@ -35,7 +35,8 @@ namespace fesutils {
 
         friend std::ostream& operator<<(std::ostream& os, const Grid& grid);
 
-
+        bool dump_binrepr_to_file(const std::string& filename);
+        bool load_binrepr_from_file(const std::string& filename);
 
         const PlumedDatHeader header_copy;
         std::vector<size_t> header_grid_field_indexes;

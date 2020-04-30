@@ -37,6 +37,9 @@
 #include "../grid/Grid.hpp"
 #include "../grid/grid_utils.hpp"
 #include "../common/limiter_decrementer_node.hpp"
+#include "../grid/grid_filler_node.hpp"
+#include "../progress/progress_printer.hpp"
+#include "../progress/progress_printer_nodes.hpp"
 
 
 namespace fesutils {
@@ -55,11 +58,6 @@ namespace fesutils {
         PlumedDatHeader header_grid =  read_cv_file_header(args.metadgrid_path);
 
         BOOST_LOG_TRIVIAL(info) << "Bias grid file: " << args.metadgrid_path;
-        BOOST_LOG_TRIVIAL(info) << "\n";
-        BOOST_LOG_TRIVIAL(info) << "-- BEGIN HEADER --";
-        BOOST_LOG_TRIVIAL(info) << header_grid;
-        BOOST_LOG_TRIVIAL(info) << "-- END   HEADER --";
-        BOOST_LOG_TRIVIAL(info) << "";
 
         size_t num_fields_grid = header_grid.fields.size();
 
@@ -81,44 +79,87 @@ namespace fesutils {
 
         BOOST_LOG_TRIVIAL(info) << "Field identified to be the bias value: " << header_grid.fields[bias_idx].name;
 
-        Grid metad_grid(header_grid);
-        BOOST_LOG_TRIVIAL(info) << "\n";
-        BOOST_LOG_TRIVIAL(info) << "-- BEGIN GRID --";
-        BOOST_LOG_TRIVIAL(info) << metad_grid;
-        BOOST_LOG_TRIVIAL(info) << "-- END   GRID --";
-        BOOST_LOG_TRIVIAL(info) << "";
-        BOOST_LOG_TRIVIAL(info) << "Number of grid fields: " << num_fields_grid;
-        BOOST_LOG_TRIVIAL(info) << "options.fileIOPerfOptions.binaryFileReadBufferSize: " << options.fileIOPerfOptions.binaryFileReadBufferSize;
-        tbb::flow::graph g_grid;
+        std::shared_ptr<Grid> metad_grid = std::make_shared<Grid>(header_grid);
 
-        tbb::flow::source_node< std::shared_ptr<std::vector<std::string>> > read_file_grid(g_grid,
-                                      read_space_separated_file_source(args.metadgrid_path,
-                                                               options.fileIOPerfOptions.binaryFileReadBufferSize ),
-                                                               false);
+        BOOST_LOG_TRIVIAL(info) << "Grid has " << metad_grid->num_dims << " dimensions.";
 
-        tbb::flow::limiter_node< std::shared_ptr<std::vector<std::string>> > limiter_input( g_grid, 100 );
 
-        tbb::flow::buffer_node< std::shared_ptr<std::vector<std::string>> > line_buffer(g_grid);
+        std::string binarydump_path = args.metadgrid_path + ".bindump";
+        BOOST_LOG_TRIVIAL(info) << "Checking for previously-generated binary dump file: " << binarydump_path;
+        bool did_load = metad_grid->load_binrepr_from_file(binarydump_path);
+        if(did_load) {
+            BOOST_LOG_TRIVIAL(info) << "Successfully loaded binary dump file, skipping grid loading.";
+            BOOST_LOG_TRIVIAL(info) << "NB: delete/move this file to re-load from original data. (eg: if the file has changed)";
+        }else {
+            BOOST_LOG_TRIVIAL(info) << "Binary dump not found, loading original data from " << args.metadgrid_path;
 
-        tbb::flow::function_node< std::shared_ptr<std::vector<std::string>>,
-                std::shared_ptr<Eigen::Array<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>, tbb::flow::rejecting >
-                double_parser_grid(g_grid, 2, parse_space_separated_double_node(num_fields_grid));
+            Progress_printer progress_printer;
+            tbb::flow::graph g_grid;
 
-        tbb::flow::function_node< std::shared_ptr<Eigen::Array<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>,
-                                  tbb::flow::continue_msg > input_limiter_decrementer(g_grid, 1,
-                          limiter_decrementer_node<std::shared_ptr<Eigen::Array<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>>());
+            tbb::flow::source_node<std::shared_ptr<std::vector<std::string>>> read_file_grid(g_grid,
+                                                                                             read_space_separated_file_source(
+                                                                                                     args.metadgrid_path,
+                                                                                                     options.fileIOPerfOptions.binaryFileReadBufferSize),
+                                                                                             false);
 
-        tbb::flow::make_edge( read_file_grid, limiter_input );
-        tbb::flow::make_edge( limiter_input, line_buffer );
-        tbb::flow::make_edge( line_buffer, double_parser_grid );
-        tbb::flow::make_edge( double_parser_grid, input_limiter_decrementer );
-        tbb::flow::make_edge( input_limiter_decrementer, limiter_input.decrement );
+            tbb::flow::limiter_node<std::shared_ptr<std::vector<std::string>>> limiter_input(g_grid, 100);
 
-        read_file_grid.activate();
+            tbb::flow::buffer_node<std::shared_ptr<std::vector<std::string>>> line_buffer(g_grid);
 
-        g_grid.wait_for_all();
+            tbb::flow::function_node<std::shared_ptr<std::vector<std::string>>,
+                    std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>, tbb::flow::rejecting>
+                    double_parser_grid(g_grid, 2, parse_space_separated_double_node(num_fields_grid));
 
-        std::cout << "\n" <<  std::endl;
+
+            tbb::flow::function_node<std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>,
+                    std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>> workpacket_registerer(
+                    g_grid, 1,
+                    progress_work_packet_registerer<std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>>(
+                            progress_printer));
+
+            tbb::flow::function_node<std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>,
+                    tbb::flow::continue_msg> bias_grid_fill(g_grid, 1,
+                                                            grid_filler_node(metad_grid, bias_idx));
+
+            tbb::flow::function_node<tbb::flow::continue_msg, tbb::flow::continue_msg> workpacket_done_reporter(g_grid,
+                                                                                                                1,
+                                                                                                                progress_work_packet_done_reporter<tbb::flow::continue_msg>(
+                                                                                                                        progress_printer));
+
+            tbb::flow::function_node<tbb::flow::continue_msg,
+                    tbb::flow::continue_msg> input_limiter_decrementer(g_grid, 1,
+                                                                       limiter_decrementer_node<tbb::flow::continue_msg>());
+
+
+            tbb::flow::make_edge(read_file_grid, limiter_input);
+            tbb::flow::make_edge(limiter_input, line_buffer);
+            tbb::flow::make_edge(line_buffer, double_parser_grid);
+            tbb::flow::make_edge(double_parser_grid, workpacket_registerer);
+            tbb::flow::make_edge(workpacket_registerer, bias_grid_fill);
+            tbb::flow::make_edge(bias_grid_fill, workpacket_done_reporter);
+            tbb::flow::make_edge(workpacket_done_reporter, input_limiter_decrementer);
+            tbb::flow::make_edge(input_limiter_decrementer, limiter_input.decrement);
+
+
+            read_file_grid.activate();
+
+            g_grid.wait_for_all();
+            progress_printer.finish();
+
+            std::cout << "\n" << std::endl;
+            BOOST_LOG_TRIVIAL(info) << "MetaD bias grid read finished.";
+
+            BOOST_LOG_TRIVIAL(info) << "Preparing to dump grid to binary file: " << binarydump_path;
+            bool did_dump = metad_grid->dump_binrepr_to_file(binarydump_path);
+            if(did_dump) {
+                BOOST_LOG_TRIVIAL(info) << "Successfully dumped grid. Next loading will be faster.";
+            }else {
+                BOOST_LOG_TRIVIAL(info)
+                    << "Unsuccessful in dumping the grid. Check write permission. This is not a fatal error.";
+            }
+        }
+
+        BOOST_LOG_TRIVIAL(info) << "MetaD bias grid is ready.";
         return;
 
 

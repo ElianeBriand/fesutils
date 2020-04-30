@@ -45,13 +45,18 @@ namespace fesutils {
 
         virtual void zeroOut() = 0;
         virtual void setAllToValue(const ValueType& value) = 0;
+
+        virtual char* get_raw_data_ptr() = 0;
+        virtual size_t get_raw_data_bytelength() = 0;
     };
 
     template<typename ValueType>
     class OneDArray : public NDArray<ValueType> {
     public:
         explicit OneDArray(const std::array<long int, 1>& dims) :
-                tensor(dims[0]) {};
+                tensor(dims[0]) {
+            this->bytelength = dims[0] * sizeof(double);
+        };
 
         virtual long int get_dims() {
             return 1;
@@ -85,7 +90,16 @@ namespace fesutils {
             this->tensor.setConstant(value);
         }
 
+        virtual char* get_raw_data_ptr() {
+            return reinterpret_cast<char*>(this->tensor.data());
+        }
+
+        virtual size_t get_raw_data_bytelength() {
+            return bytelength;
+        }
+
     private:
+        size_t bytelength;
         Eigen::Tensor<ValueType, 1> tensor;
     };
 
@@ -93,7 +107,9 @@ namespace fesutils {
     class TwoDArray : public NDArray<ValueType> {
     public:
         explicit TwoDArray(const std::array<long int, 2>& dims) :
-                tensor(dims[0], dims[1]) {};
+                tensor(dims[0], dims[1]) {
+                this->bytelength = dims[0] * dims[1] * sizeof(double);
+            };
 
         virtual long int get_dims() {
             return 2;
@@ -127,7 +143,16 @@ namespace fesutils {
             this->tensor.setConstant(value);
         }
 
+        virtual char* get_raw_data_ptr() {
+            return reinterpret_cast<char*>(this->tensor.data());
+        }
+
+        virtual size_t get_raw_data_bytelength() {
+            return bytelength;
+        }
+
     private:
+        size_t bytelength;
         Eigen::Tensor<ValueType, 2> tensor;
     };
 
@@ -136,7 +161,9 @@ namespace fesutils {
     class ThreeDArray : public NDArray<ValueType> {
     public:
         explicit ThreeDArray(const std::array<long int, 3>& dims) :
-                tensor(dims[0], dims[1], dims[2]) {};
+                tensor(dims[0], dims[1], dims[2]) {
+            this->bytelength = dims[0] * dims[1] * dims[2] * sizeof(double);
+        };
 
         virtual long int get_dims() {
             return 3;
@@ -170,7 +197,16 @@ namespace fesutils {
             this->tensor.setConstant(value);
         }
 
+        virtual char* get_raw_data_ptr() {
+            return reinterpret_cast<char*>(this->tensor.data());
+        }
+
+        virtual size_t get_raw_data_bytelength() {
+            return bytelength;
+        }
+
     private:
+        size_t bytelength;
         Eigen::Tensor<ValueType, 3> tensor;
     };
 
@@ -180,7 +216,9 @@ namespace fesutils {
     class FourDArray : public NDArray<ValueType> {
     public:
         explicit FourDArray(const std::array<long int, 4>& dims) :
-                tensor(dims[0], dims[1], dims[2], dims[3]) {};
+                tensor(dims[0], dims[1], dims[2], dims[3]) {
+            this->bytelength = dims[0] * dims[1] * dims[2] * dims[3] * sizeof(double);
+        };
 
         virtual long int get_dims() {
             return 4;
@@ -214,7 +252,16 @@ namespace fesutils {
             this->tensor.setConstant(value);
         }
 
+        virtual char* get_raw_data_ptr() {
+            return reinterpret_cast<char*>(this->tensor.data());
+        }
+
+        virtual size_t get_raw_data_bytelength() {
+            return bytelength;
+        }
+
     private:
+        size_t bytelength;
         Eigen::Tensor<ValueType, 4> tensor;
     };
 

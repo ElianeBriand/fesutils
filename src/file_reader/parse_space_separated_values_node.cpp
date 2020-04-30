@@ -34,9 +34,7 @@ std::shared_ptr<Eigen::Array<double,
         Eigen::Dynamic,
         Eigen::RowMajor>>
 fesutils::parse_space_separated_double_node::operator()(const std::shared_ptr<std::vector<std::string>> lines_sptr) {
-    this->dbg_call_to_operator++;
     size_t num_row = lines_sptr->size();
-
 
     auto array = std::make_shared<Eigen::Array<double,
             Eigen::Dynamic,
@@ -44,7 +42,7 @@ fesutils::parse_space_separated_double_node::operator()(const std::shared_ptr<st
             Eigen::RowMajor>>(num_row, this->num_columns);
 
     std::vector<double> line_data;
-    line_data.reserve(this->num_columns);
+    line_data.reserve((size_t)this->num_columns);
     size_t curr_row_id  = 0;
     size_t curr_lines_block_idx = 0;
     for(const std::string& l : *lines_sptr) {
@@ -62,15 +60,14 @@ fesutils::parse_space_separated_double_node::operator()(const std::shared_ptr<st
 
 
         if(line_data.size() != this->num_columns) {
+            this->error_count++;
             BOOST_LOG_TRIVIAL(debug) << "--------  BEGIN MALFORMED LINE DEBUG INFORMATION -------";
             BOOST_LOG_TRIVIAL(debug) << "Tokens: ";
             for(const auto& token: line_data) {
                 BOOST_LOG_TRIVIAL(debug) << "   Token: " << token;
             }
             BOOST_LOG_TRIVIAL(debug) << "Success: " << success;
-
-            this->error_count++;
-            BOOST_LOG_TRIVIAL(debug) << "Nbr call to operator " << this->dbg_call_to_operator;
+            BOOST_LOG_TRIVIAL(debug) << "Error count: " << this->error_count;
             BOOST_LOG_TRIVIAL(debug) << "Malformed line dropped: " << l;
             BOOST_LOG_TRIVIAL(debug) << "Index in block " << curr_lines_block_idx-1 << " of " << lines_sptr->size();
             BOOST_LOG_TRIVIAL(debug) << "Expected " << this->num_columns << " values but got " << line_data.size();
@@ -111,6 +108,5 @@ fesutils::parse_space_separated_double_node::operator()(const std::shared_ptr<st
 fesutils::parse_space_separated_double_node::parse_space_separated_double_node(size_t num_cols) :
         num_columns(num_cols),
         error_count(0),
-        processed_count(0),
-        dbg_call_to_operator(0)
+        processed_count(0)
         { }

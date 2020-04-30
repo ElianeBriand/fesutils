@@ -156,21 +156,19 @@ std::optional<size_t> fesutils::find_likely_bias_field_index(const fesutils::Plu
     std::optional<size_t> ret;
 
     size_t number_of_hit = std::count_if(header.fields.begin(), header.fields.end(), [](const Field& f) {
-        return f.name.find("bias") != std::string::npos; // Find field that has bias
+        return f.name.find(".bias") != std::string::npos; // Find field that has bias
     });
 
     if(number_of_hit == 0 || number_of_hit > 1) {
         // No matching field, or more than 1: can't guess
         return ret;
-    } else if(number_of_hit == 1) {
+    } else { // (number_of_hit == 1)
         // Exactly one matching field: likely to be bias
 
         auto it = std::find_if(header.fields.begin(), header.fields.end(), [](const Field& f) {
-            return f.name.find("bias") != std::string::npos; // Find field that has bias
+            return f.name.find(".bias") != std::string::npos; // Find field that has bias
         });
 
         return std::optional<size_t>(std::distance(header.fields.begin(), it));
     }
-
-    return ret;
 }
