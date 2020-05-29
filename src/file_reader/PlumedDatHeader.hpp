@@ -49,10 +49,16 @@ namespace fesutils {
 
 
     struct PlumedDatHeader {
+        std::optional<std::string> originating_file_path;
+
         std::vector<Field> fields;
 
 
         friend std::ostream& operator<<(std::ostream& os, const PlumedDatHeader& hd);
+
+        size_t find_field_index_from_name(const std::string& name);
+
+        std::map<std::string, std::variant<bool, int, double>> attributes;
 
 
     };

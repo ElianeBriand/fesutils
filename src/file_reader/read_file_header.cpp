@@ -66,9 +66,7 @@ namespace fesutils {
     }
 
     void parse_SET_line(PlumedDatHeader& header, const std::string& line) {
-        static const std::set<std::string> attribute_double = {"min", "max"};
-        static const std::set<std::string> attribute_int = {"nbins"};
-        static const std::set<std::string> attribute_bool = {"periodic"};
+
 
         std::vector<std::string> tokens = slow_tokenize(line);
 
@@ -82,45 +80,15 @@ namespace fesutils {
         const std::string attribute_name = std::get<0>(res);
         const std::string fieldname = std::get<1>(res);
 
-        auto field_it = std::find_if(header.fields.begin(), header.fields.end(), [&fieldname](const Field& elem) {
-            return (elem.name) == fieldname;
-        });
+        const std::string& value = tokens.at(3);
 
-        if(attribute_double.count(attribute_name)) {
-            double attr_value = 0.0;
-            try {
-                attr_value = boost::lexical_cast<double>(tokens.at(3));
-            } catch (boost::bad_lexical_cast& e) {
-                BOOST_LOG_TRIVIAL(error) << "SET header line: " << line;
-                BOOST_LOG_TRIVIAL(error) << "has attribute value that should be parseable to double, but is not. ";
-                throw std::runtime_error("Incorrect SET attribute value");
-            }
-            field_it->attributes[attribute_name] = attr_value;
-
-        } else if(attribute_bool.count(attribute_name)) {
-            bool attr_value = false;
-            try {
-                attr_value = parse_bool_as_word(tokens.at(3));
-            } catch (std::runtime_error& e) {
-                BOOST_LOG_TRIVIAL(error) << "SET header line: " << line;
-                BOOST_LOG_TRIVIAL(error) << "has attribute value that should be parseable to bool, but is not. ";
-                throw std::runtime_error("Incorrect SET attribute value");
-            }
-            field_it->attributes[attribute_name] = attr_value;
-        } else if(attribute_int.count(attribute_name)) {
-            int attr_value = 0.0;
-            try {
-                attr_value = boost::lexical_cast<int>(tokens.at(3));
-            } catch (boost::bad_lexical_cast& e) {
-                BOOST_LOG_TRIVIAL(error) << "SET header line: " << line;
-                BOOST_LOG_TRIVIAL(error) << "has attribute value that should be parseable to int, but is not. ";
-                throw std::runtime_error("Incorrect SET attribute value");
-            }
-            field_it->attributes[attribute_name] = attr_value;
+        if(fieldname == "") {
+            // Non-variable-linked attribute
+            set_global_attribute(header, attribute_name,value);
         } else {
-            BOOST_LOG_TRIVIAL(debug) << "Unhandled SET attribute" << attribute_name << " has been discarded.";
+            // Variable-linked attribute
+            set_field_attribute(header, attribute_name, fieldname, value);
         }
-
     }
 
     std::tuple<std::string, std::string> extract_basename_subfield_from_field_name(const std::string& field) {
@@ -142,13 +110,14 @@ namespace fesutils {
         size_t first_underscore =  attrfield.find('_');
 
         if (first_underscore == std::string::npos) {
-            // No "_" in attrfield -> malformed attribute field
-            BOOST_LOG_TRIVIAL(error) << "Attribute field ;" << attrfield;
-            BOOST_LOG_TRIVIAL(error) << "is malformed. Typical <attribute>_<varname>";
-            throw std::runtime_error("Incorrect attribute field formatting");
+            // No "_" in attrfield -> no a variable-related attribute
+            return std::make_tuple(attrfield, "");
         }
 
         std::tuple<std::string, std::string> result = std::make_tuple(attrfield.substr(0,first_underscore), attrfield.substr(first_underscore+1));
+
+
+
 
         if(std::get<0>(result) == "") {
             BOOST_LOG_TRIVIAL(error) << "Attribute field :" << attrfield;
@@ -178,6 +147,8 @@ namespace fesutils {
 
         std::ifstream inputf(path);
 
+        header.originating_file_path = path;
+
         std::string line;
         while(getline( inputf, line ) ) {
             if (line.empty() || line[0] != '#') {
@@ -195,6 +166,99 @@ namespace fesutils {
 
 
         return header;
+    }
+
+
+    void set_global_attribute(PlumedDatHeader& header, const std::string& attribute_name, const std::string& value) {
+        static const std::set<std::string> attribute_double = {"normalisation"};
+        static const std::set<std::string> attribute_int = {};
+        static const std::set<std::string> attribute_bool = {};
+
+        if(attribute_double.count(attribute_name)) {
+            double attr_value = 0.0;
+            try {
+                attr_value = boost::lexical_cast<double>(value);
+            } catch (boost::bad_lexical_cast& e) {
+                BOOST_LOG_TRIVIAL(error) << "Attribute " << attribute_name << " has value that should be parseable to double,"
+                                                                              " but is not. ( value = \"" << value << "\")";
+                throw std::runtime_error("Incorrect SET attribute value");
+            }
+            header.attributes[attribute_name] = attr_value;
+
+
+        /*   // Currently only double-valued global attribute exists
+        } else if(attribute_bool.count(attribute_name)) {
+            bool attr_value = false;
+            try {
+                attr_value = parse_bool_as_word(value);
+            } catch (std::runtime_error& e) {
+                BOOST_LOG_TRIVIAL(error) << "Attribute " << attribute_name << " has value that should be parseable to bool,"
+                                                                              " but is not. ( value = \"" << value << "\")";
+
+                throw std::runtime_error("Incorrect SET attribute value");
+            }
+            header.attributes[attribute_name] = attr_value;
+        } else if(attribute_int.count(attribute_name)) {
+            int attr_value = 0;
+            try {
+                attr_value = boost::lexical_cast<int>(value);
+            } catch (boost::bad_lexical_cast& e) {
+                BOOST_LOG_TRIVIAL(error) << "Attribute " << attribute_name << " has value that should be parseable to int,"
+                                                                              " but is not. ( value = \"" << value << "\")";
+                throw std::runtime_error("Incorrect SET attribute value");
+            }
+            header.attributes[attribute_name] = attr_value;
+            */
+        } else {
+            BOOST_LOG_TRIVIAL(warning) << "Unhandled SET attribute" << attribute_name << " has been discarded.";
+        }
+
+    }
+
+    void set_field_attribute(PlumedDatHeader& header, const std::string& attribute_name, const std::string& field_name, const std::string& value) {
+        static const std::set<std::string> attribute_double = {"min", "max"};
+        static const std::set<std::string> attribute_int = {"nbins"};
+        static const std::set<std::string> attribute_bool = {"periodic"};
+
+        auto field_it = std::find_if(header.fields.begin(), header.fields.end(), [&field_name](const Field& elem) {
+            return (elem.name) == field_name;
+        });
+
+        if(attribute_double.count(attribute_name)) {
+            double attr_value = 0.0;
+            try {
+                attr_value = boost::lexical_cast<double>(value);
+            } catch (boost::bad_lexical_cast& e) {
+                BOOST_LOG_TRIVIAL(error) << "Attribute " << attribute_name << " has value that should be parseable to double,"
+                                                                              " but is not. ( value = \"" << value << "\")";
+                throw std::runtime_error("Incorrect SET attribute value");
+            }
+            field_it->attributes[attribute_name] = attr_value;
+
+        } else if(attribute_bool.count(attribute_name)) {
+            bool attr_value = false;
+            try {
+                attr_value = parse_bool_as_word(value);
+            } catch (std::runtime_error& e) {
+                BOOST_LOG_TRIVIAL(error) << "Attribute " << attribute_name << " has value that should be parseable to bool,"
+                                                                              " but is not. ( value = \"" << value << "\")";
+
+                throw std::runtime_error("Incorrect SET attribute value");
+            }
+            field_it->attributes[attribute_name] = attr_value;
+        } else if(attribute_int.count(attribute_name)) {
+            int attr_value = 0;
+            try {
+                attr_value = boost::lexical_cast<int>(value);
+            } catch (boost::bad_lexical_cast& e) {
+                BOOST_LOG_TRIVIAL(error) << "Attribute " << attribute_name << " has value that should be parseable to int,"
+                                                                              " but is not. ( value = \"" << value << "\")";
+                throw std::runtime_error("Incorrect SET attribute value");
+            }
+            field_it->attributes[attribute_name] = attr_value;
+        } else {
+            BOOST_LOG_TRIVIAL(warning) << "Unhandled SET attribute" << attribute_name << " has been discarded.";
+        }
     }
 
 }

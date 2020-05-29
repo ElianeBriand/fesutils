@@ -18,36 +18,32 @@
  *
  */
 
-#ifndef FESUTILS_FINAL_BIAS_REWEIGHT_HPP
-#define FESUTILS_FINAL_BIAS_REWEIGHT_HPP
+#ifndef FESUTILS_RECONSTRUCT_FROM_FRAGMENTS_HPP
+#define FESUTILS_RECONSTRUCT_FROM_FRAGMENTS_HPP
 
 #include <string>
 #include <optional>
+#include <vector>
 
 #include "../GeneralOptions.h"
 
-
 namespace fesutils {
 
-    struct final_bias_reweight_args {
-        std::string cvfile_path;
-        std::string metadgrid_path;
-        std::string ranges_min_rawstr;
-        std::string ranges_max_rawstr;
+    struct reconstruct_from_fragments_args {
+        std::vector<std::string> fragment_fes_paths;
 
-        std::optional<std::string> biasfield;
+        std::optional<std::string> fefield;
     };
 
     /**
-     * Entry point for the final_bias_reweight subcommand.
+     * Entry point for the reconstruct_from_fragments subcommand.
      *
      * \param options General options passed on the command line
      * \param args Specific arguments for the command, passed as a struct
      */
-    int do_final_bias_reweight(GeneralOptions& options,
-                                const final_bias_reweight_args& args);
+    int do_reconstruct_from_fragments(GeneralOptions& options,
+                                const reconstruct_from_fragments_args& args);
 
 }
 
-
-#endif //FESUTILS_FINAL_BIAS_REWEIGHT_HPP
+#endif //FESUTILS_RECONSTRUCT_FROM_FRAGMENTS_HPP

@@ -62,7 +62,25 @@ namespace fesutils{
 
     // Internals exposed for testing
 
+    /** Return the indexes (in sizeof(uint8_t)) of the \n in the buffer
+     *
+     * \param eol_index reference to  empty vector to receive the indexes
+     * \param buffer uint8_t vector as buffer
+     */
     void find_eol_indexes(std::vector<size_t>& eol_index,const std::vector<uint8_t>& buffer);
+
+    /** From a buffer and the indexes of \n, split into lines to be put into a vector of string
+     *
+     * Also keep count of number of processed lines and errors if they occur. Put the last (incomplete line)
+     * into the remainder.
+     *
+     * \param lines_sptr vector of sptr to string to be filled with the lines
+     * \param remainder
+     * \param buffer
+     * \param eol_index
+     * \param processed_count
+     * \param error_count
+     */
     void line_from_eol_indexes(std::shared_ptr<std::vector<std::string>> lines_sptr,
                                std::string& remainder,
                                const std::vector<uint8_t>& buffer,

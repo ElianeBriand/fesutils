@@ -18,6 +18,12 @@
  *
  */
 #include "PlumedDatHeader.hpp"
+
+#include <algorithm>
+
+#include <boost/log/trivial.hpp>
+
+
 namespace fesutils {
 
     // LCOV_EXCL_START
@@ -37,6 +43,26 @@ namespace fesutils {
         }
 
         return os;
+    }
+
+    size_t PlumedDatHeader::find_field_index_from_name(const std::string& name) {
+
+        auto it = std::find_if(this->fields.begin(), this->fields.end(), [&](const Field& f) {
+            return f.name == name; // Find field that has bias
+        });
+        if(it != this->fields.end()) {
+            return std::distance(this->fields.begin(), it);
+        } else {
+            BOOST_LOG_TRIVIAL(error) << "Requesting index of field \"" << name << "\" which is not present in this header";
+            if(this->originating_file_path.has_value()) {
+                BOOST_LOG_TRIVIAL(error) << "  Header was parsed from: " << this->originating_file_path.value();
+            }
+            BOOST_LOG_TRIVIAL(error) << "  Existing field names: ";
+            for(const auto& field: this->fields) {
+                BOOST_LOG_TRIVIAL(error) << "     - " << field.name;
+            }
+            throw std::runtime_error("Requested field is not present in header");
+        }
     }
 
     // LCOV_EXCL_STOP

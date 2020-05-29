@@ -40,15 +40,16 @@
 #include "../grid/grid_filler_node.hpp"
 #include "../progress/progress_printer.hpp"
 #include "../progress/progress_printer_nodes.hpp"
+#include "../file_reader/field_function_heuristics.hpp"
 
 
 namespace fesutils {
 
     // LCOV_EXCL_START
     // Reason for coverage exclusion: subject to system testing, not unit testing
-    // System test script: st_final_bias_reweight
+    // System test script: st_final_bias_reweight.py
 
-    void do_final_bias_reweight(GeneralOptions& options,
+    int do_final_bias_reweight(GeneralOptions& options,
                                 const final_bias_reweight_args& args) {
 
         std::vector<float> range_min = extract_range_from_string(args.ranges_min_rawstr);
@@ -63,10 +64,7 @@ namespace fesutils {
 
         size_t bias_idx = 0;
         if(args.biasfield.has_value()) {
-            auto it = std::find_if(header_grid.fields.begin(), header_grid.fields.end(), [&](const Field& f) {
-                return f.name == args.biasfield.value(); // Find field that has bias
-            });
-            bias_idx = std::distance(header_grid.fields.begin(), it);
+            bias_idx = header_grid.find_field_index_from_name(args.biasfield.value());
         } else {
             std::optional<size_t> maybe_bias_indx =  find_likely_bias_field_index(header_grid);
             if(!maybe_bias_indx.has_value()) {
@@ -160,7 +158,7 @@ namespace fesutils {
         }
 
         BOOST_LOG_TRIVIAL(info) << "MetaD bias grid is ready.";
-        return;
+        return 0;
 
 
         // ///// Then read the CV file and do the histogram
@@ -191,6 +189,7 @@ namespace fesutils {
 
         g_cv.wait_for_all();
 
+        return 0;
 
     }
 

@@ -11,8 +11,8 @@ if(SANITIZER_BUILD)
     message("Sanitizer build enabled")
     SET (CMAKE_CXX_COMPILER             "clang")
     SET (CMAKE_CXX_COMPILER             "clang++")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
-    set (CMAKE_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+    set (CMAKE_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
 else()
     message("Sanitizer build disabled")
 endif()
@@ -46,7 +46,7 @@ if(COVERAGE_BUILD)
 endif()
 
 
-find_package(Boost 1.67 REQUIRED COMPONENTS program_options log_setup log unit_test_framework iostreams REQUIRED)
+find_package(Boost 1.67 COMPONENTS program_options log_setup log unit_test_framework iostreams REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
@@ -69,6 +69,9 @@ set(PCH_SYST_HEADER_LIST
         <vector>
         <memory>
         <map>
+        <tuple>
+        <algorithm>
+        <optional>
         <variant>
         <fmt/format.h>
         <boost/log/trivial.hpp>
@@ -99,7 +102,7 @@ set(SOURCE_LIST src/GeneralOptions.cpp
                 src/grid/grid_utils.cpp
                 src/grid/grid_utils.hpp
                 src/grid/Grid.cpp
-                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp src/grid/grid_filler_node.cpp src/grid/grid_filler_node.hpp src/progress/progress_printer.cpp src/progress/progress_printer.hpp src/progress/progress_printer_nodes.hpp)
+                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp src/grid/grid_filler_node.cpp src/grid/grid_filler_node.hpp src/progress/progress_printer.cpp src/progress/progress_printer.hpp src/progress/progress_printer_nodes.hpp src/reconstruct_from_fragments/reconstruct_from_fragments.cpp src/reconstruct_from_fragments/reconstruct_from_fragments.hpp src/grid/ingest_grid.cpp src/grid/ingest_grid.hpp src/file_reader/field_function_heuristics.cpp src/file_reader/field_function_heuristics.hpp)
 
 set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt)
 
@@ -119,11 +122,17 @@ target_precompile_headers(fesutils
         )
 endif()
 
-add_custom_command(
-        TARGET fesutils POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/system_tests/st_final_bias_reweight.py
-        ${CMAKE_CURRENT_BINARY_DIR}/st_final_bias_reweight.py)
+set(SYSTEM_TEST_FILENAMES_STEMS st_final_bias_reweight st_reconstruct_from_fragments)
+
+foreach(SysTestFile IN LISTS SYSTEM_TEST_FILENAMES_STEMS)
+    add_custom_command(
+            TARGET fesutils POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/system_tests/${SysTestFile}.py
+            ${CMAKE_CURRENT_BINARY_DIR}/${SysTestFile}.py)
+endforeach()
+
+
 
 
 enable_testing()
@@ -135,7 +144,7 @@ set(TEST_SOURCE_LIST
         src/unit_tests/file_reader/read_file_ts.cpp
         src/unit_tests/TempTextFile.hpp
         src/unit_tests/TempTextFile.cpp
-        src/unit_tests/file_reader/parse_space_separated_values_ts.cpp src/unit_tests/grid/grid_utils_ts.cpp src/unit_tests/grid/grid_ts.cpp src/unit_tests/MiscFixture.cpp src/unit_tests/MiscFixture.hpp src/grid/NDArray.cpp src/grid/NDArray.hpp src/unit_tests/grid/ndarray_ts.cpp src/unit_tests/common/misc_ts.cpp src/unit_tests/grid/grid_filler_node_ts.cpp src/unit_tests/progress/progress_printer_ts.cpp)
+        src/unit_tests/file_reader/parse_space_separated_values_ts.cpp src/unit_tests/grid/grid_utils_ts.cpp src/unit_tests/grid/grid_ts.cpp src/unit_tests/MiscFixture.cpp src/unit_tests/MiscFixture.hpp src/grid/NDArray.cpp src/grid/NDArray.hpp src/unit_tests/grid/ndarray_ts.cpp src/unit_tests/common/misc_ts.cpp src/unit_tests/grid/grid_filler_node_ts.cpp src/unit_tests/progress/progress_printer_ts.cpp src/unit_tests/file_reader/field_function_heuristics_ts.cpp src/unit_tests/grid/ingest_grid_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})
@@ -154,15 +163,18 @@ endif()
 
 target_compile_options(complete_test_suite PRIVATE -Wno-ignored-attributes)
 
-add_custom_command(
-        TARGET complete_test_suite POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/system_tests/st_final_bias_reweight.py
-        ${CMAKE_CURRENT_BINARY_DIR}/st_final_bias_reweight.py)
+foreach(SysTestFile IN LISTS SYSTEM_TEST_FILENAMES_STEMS)
+    add_custom_command(
+            TARGET complete_test_suite POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/system_tests/${SysTestFile}.py
+            ${CMAKE_CURRENT_BINARY_DIR}/${SysTestFile}.py)
+    add_test(NAME fesutils_${SysTestFile}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMAND python3 ${SysTestFile}.py)
+endforeach()
+
 
 
 add_test(fesutils_unittest complete_test_suite --catch_system_error=yes --log_level=all )
 
-add_test(NAME fesutils_systemtest_final_bias_reweight
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND python3 st_final_bias_reweight.py)

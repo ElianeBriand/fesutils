@@ -50,6 +50,23 @@ namespace fesutils {
      */
     void parse_SET_line(PlumedDatHeader& header, const std::string& line);
 
+
+    /** Set global attribute in header given string representation of attribute and value
+     * \param header PlumedDatHeader to fill
+     * \param attribute_name attribute name string
+     * \param value value string
+     */
+    void set_global_attribute(PlumedDatHeader& header, const std::string& attribute_name, const std::string& value);
+
+    /** Set field-linked attribute in header given string representation of attribute and value
+     * \param header PlumedDatHeader to fill
+     * \param attribute_name attribute name string
+     * \param field_name field name as string
+     * \param value value string
+     */
+    void set_field_attribute(PlumedDatHeader& header, const std::string& attribute_name, const std::string& field_name, const std::string& value);
+
+
     /**
      * Extract the components of a "basename.subfield" field name. Does not support multiple levels (basename.subfield.subfield)
      * or empty subfield: in these cases, return whole field as basename.

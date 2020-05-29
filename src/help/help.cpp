@@ -28,7 +28,7 @@ namespace fesutils {
     // LCOV_EXCL_START
     // Reason for coverage exclusion: purely console printing function
 
-    void do_help(const std::string& command) {
+    int do_help(const std::string& command) {
         /*
         if(command == "final_bias_reweight")  {
 
@@ -41,6 +41,7 @@ namespace fesutils {
         BOOST_LOG_TRIVIAL(info) << "Available subcommands: ";
         BOOST_LOG_TRIVIAL(info) << "final_bias_reweight - Reweight frames from a MetaD trajectory using a final bias grid.";
 
+        return 0;
     }
 
     // LCOV_EXCL_STOP

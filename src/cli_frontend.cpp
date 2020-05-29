@@ -29,6 +29,7 @@
 #include "final_bias_reweight/final_bias_reweight.hpp"
 #include "frontend_common.h"
 #include "help/help.hpp"
+#include "reconstruct_from_fragments/reconstruct_from_fragments.hpp"
 
 namespace po = boost::program_options;
 
@@ -83,7 +84,7 @@ int main(int argc, char** argv) {
 
     BOOST_LOG_TRIVIAL(info) << "";
     BOOST_LOG_TRIVIAL(info) << "fesutils v0.1";
-    BOOST_LOG_TRIVIAL(info) << "Copyright (C) 2010  Eliane Briand";
+    BOOST_LOG_TRIVIAL(info) << "Copyright (C) 2020  Eliane Briand";
     BOOST_LOG_TRIVIAL(info) << "    This program comes with ABSOLUTELY NO WARRANTY.";
     BOOST_LOG_TRIVIAL(info) << "    This is free software, and you are welcome to redistribute it.";
     BOOST_LOG_TRIVIAL(info) << "    You should have received a copy of the GNU General Public License version 3";
@@ -105,7 +106,7 @@ int main(int argc, char** argv) {
                     ("metadgrid", po::value<std::string>(),
                      "File with the MetaD grid potential, typically dumped with WGRID_FILE")
                     ("biasfield", po::value<std::string>(),
-                     "Name of the field corresponding to the bias value")
+                     "Use field with this name for the bias value (override heuristic detection)")
                     ("ranges_min", po::value<std::string>(),
                      "Minimal threhold value of the variable for the frame to be considered. Can be multiple values: 0.0,1.2,3.1.")
                     ("ranges_max", po::value<std::string>(),
@@ -118,32 +119,78 @@ int main(int argc, char** argv) {
             // Parse again...
             po::store(po::command_line_parser(opts).options(fbw_desc).run(), vm);
 
-            if( !(vm.count("cvfile")) ||
+            if (!(vm.count("cvfile")) ||
                 !(vm.count("outfile")) ||
                 !(vm.count("metadgrid"))
-                ) {
-                BOOST_LOG_TRIVIAL(error) << "Missing mandatory parameters for final_bias_reweight: --cvfile, --outfile and/or --metadgrid";
+                    ) {
+                BOOST_LOG_TRIVIAL(error)
+                    << "Missing mandatory parameters for final_bias_reweight: --cvfile, --outfile and/or --metadgrid";
                 BOOST_LOG_TRIVIAL(error) << fbw_desc;
 
-            }else {
+            } else {
                 f::final_bias_reweight_args args;
 
-                if(vm.count("ranges_min")) {
+                if (vm.count("ranges_min")) {
                     args.ranges_min_rawstr = vm["ranges_min"].as<std::string>();
                 }
 
-                if(vm.count("ranges_max")) {
+                if (vm.count("ranges_max")) {
                     args.ranges_max_rawstr = vm["ranges_min"].as<std::string>();
+                }
+
+                if(vm.count("biasfield")) {
+                    args.biasfield = vm["biasfield"].as< std::string>();
                 }
 
                 args.cvfile_path = vm["cvfile"].as<std::string>();
 
                 args.metadgrid_path = vm["metadgrid"].as<std::string>();
 
-                f::do_final_bias_reweight(options, args);
+                return f::do_final_bias_reweight(options, args);
 
-                return 0;
             }
+        }else if(cmd == "reconstruct_from_fragments") {
+
+            po::options_description rff_desc("reconstruct_from_fragments options");
+            rff_desc.add_options()
+                    ("outfile", po::value<std::string>(), "File to output the reconstructed FES to.")
+                    ("fragmentfes", po::value<std::vector<std::string>>(),
+                     "Files with the FES grid. Use multiple time for each fragment")
+                    ("algorithm", po::value<std::string>(),
+                     "Which algorithm to use for reconstruction")
+                    ("fragmentinfo", po::value<std::string>(),
+                     "File containing information necessary for the reconstruction. Used to various extend by the reconstruction algorithms")
+                    ("fefield", po::value<std::string>(),
+                     "Use field with this name for the free energy value (override heuristic detection)")
+                     ;
+
+            // Erases the already parsed options (including command)
+            std::vector<std::string> opts = po::collect_unrecognized(parsed.options, po::include_positional);
+            opts.erase(opts.begin());
+
+            // Parse again...
+            po::store(po::command_line_parser(opts).options(rff_desc).run(), vm);
+
+            if (!(vm.count("fragmentfes")) ||
+                !(vm.count("outfile")) ||
+                !(vm.count("algorithm")) ||
+                !(vm.count("fragmentinfo"))
+                    ) {
+                BOOST_LOG_TRIVIAL(error)
+                    << "Missing mandatory parameters for reconstruct_from_fragments: --fragmentfes, --outfile, --fragmentinfo and/or --metadgrid";
+                BOOST_LOG_TRIVIAL(error) << rff_desc;
+            }else {
+                f::reconstruct_from_fragments_args args;
+
+                if(vm.count("fefield")) {
+                    args.fefield = vm["fefield"].as< std::string>();
+                }
+
+                args.fragment_fes_paths = vm["fragmentfes"].as< std::vector<std::string> >();
+
+                return f::do_reconstruct_from_fragments(options, args);
+            }
+
         }else if (cmd == "help") {
             po::positional_options_description pos_help;
             pos_help.add("which_command", 1);
@@ -162,8 +209,9 @@ int main(int argc, char** argv) {
             }
             std::string which_cmd = vm["which_command"].as<std::string>();
 
-            f::do_help(which_cmd);
-        }else {
+            return f::do_help(which_cmd);
+
+        } else {
             BOOST_LOG_TRIVIAL(error) << "Unrecognised command: " << cmd;
         }
     }

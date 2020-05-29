@@ -189,6 +189,7 @@ namespace fesutils {
 
         std::shared_ptr<std::vector<uint8_t>> raw_block;
 
+        // Read binary data from file
         bool ret = read_file_source::operator()(raw_block);
 
         if(!ret)
@@ -196,15 +197,12 @@ namespace fesutils {
 
         std::vector<size_t> eol_index;
 
-
+        // Find where the \n are
         find_eol_indexes(eol_index, *raw_block);
 
-        std::string begin_of_block((char*) (raw_block->data()), 300 );
-
-        std::string end_of_block((char*) (raw_block->data() + raw_block->size() - 300), 300 );
-
-
+        // Separate into line, and deal with the unfinished last line (this->remainder)
         line_from_eol_indexes(lines_sptr,this->remainder, *raw_block, eol_index, this->processed_count, this->error_count);
+
 
         return true;
     }

@@ -44,6 +44,8 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
     BOOST_AUTO_TEST_CASE(read_cv_file_header_existent_tc) {
 
         const std::string filecontent = "#! FIELDS aaa bbb.dd\n"
+                                        "#! SET min_aaa 4.90\n"
+                                        "#! SET normalisation 2.20\n"
                                         "# OtherHeaderField\n"
                                         "0.112 0.12\n"
                                         "-1.4 0.0e-3\n"
@@ -65,6 +67,15 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
         BOOST_TEST(header.fields[1].basename == "bbb");
         BOOST_TEST(header.fields[1].subfield == "dd");
+
+        BOOST_TEST(header.attributes.size() == 1);
+        BOOST_REQUIRE(header.attributes.size() == 1);
+        BOOST_TEST(header.attributes.count("normalisation") == 1);
+        BOOST_REQUIRE(header.attributes.count("normalisation") == 1);
+        BOOST_TEST(std::holds_alternative<double>(header.attributes["normalisation"]));
+        BOOST_REQUIRE(std::holds_alternative<double>(header.attributes["normalisation"]));
+        BOOST_TEST(std::get<double>(header.attributes["normalisation"]) == 2.20);
+
 
     }
 
@@ -150,6 +161,31 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
             f::PlumedDatHeader header;
             f::parse_FIELDS_line(header, "#! FIELDS a b.d c..d");
 
+            f::parse_SET_line(header, "#! SET normalisation 2.4");
+
+            BOOST_TEST(header.attributes.size() == 1);
+            BOOST_REQUIRE(header.attributes.size() == 1);
+            BOOST_TEST(header.attributes.count("normalisation") == 1);
+            BOOST_REQUIRE(header.attributes.count("normalisation") == 1);
+            BOOST_TEST(std::holds_alternative<double>(header.attributes["normalisation"]));
+            BOOST_REQUIRE(std::holds_alternative<double>(header.attributes["normalisation"]));
+            BOOST_TEST(std::get<double>(header.attributes["normalisation"]) == 2.4);
+
+
+            BOOST_CHECK_THROW( std::get<bool>(header.attributes["normalisation"]), std::bad_variant_access );
+            BOOST_CHECK_THROW( std::get<int>(header.attributes["normalisation"]), std::bad_variant_access );
+
+            f::parse_SET_line(header, "#! SET globalattributenotknown 2.4");
+
+            // Should not be added if not known
+            BOOST_TEST(header.attributes.size() == 1);
+
+        }
+
+        {
+            f::PlumedDatHeader header;
+            f::parse_FIELDS_line(header, "#! FIELDS a b.d c..d");
+
             // Unknown attribute should not in be added to the map
             f::parse_SET_line(header, "#! SET moop_a 2.4");
 
@@ -192,6 +228,9 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
             // Should be bool, but is double: should throw
             BOOST_CHECK_THROW(f::parse_SET_line(header, "#! SET periodic_a 2.8"), std::runtime_error );
 
+            // Should be double, but is bool: should throw
+            BOOST_CHECK_THROW(f::parse_SET_line(header, "#! SET normalisation false"), std::runtime_error );
+
         }
 
     }
@@ -205,7 +244,13 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
             BOOST_TEST(std::get<1>(res) == "varname");
         }
 
-        BOOST_CHECK_THROW( f::extract_attribute_field_from_attrfield("nounderscore"), std::runtime_error );
+        {
+            std::tuple<std::string, std::string> res = f::extract_attribute_field_from_attrfield("nounderscore");
+
+            BOOST_TEST(std::get<0>(res) == "nounderscore");
+            BOOST_TEST(std::get<1>(res) == "");
+        }
+
         BOOST_CHECK_THROW( f::extract_attribute_field_from_attrfield("emptyvarname_"), std::runtime_error );
         BOOST_CHECK_THROW( f::extract_attribute_field_from_attrfield("_emptyattribute"), std::runtime_error );
 

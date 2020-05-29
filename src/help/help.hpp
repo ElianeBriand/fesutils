@@ -30,7 +30,7 @@ namespace fesutils {
      *
      * \param command subcommand name or topic
      */
-    void do_help(const std::string& command);
+    int do_help(const std::string& command);
 
 }
 

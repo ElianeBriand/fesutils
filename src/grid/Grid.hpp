@@ -25,6 +25,7 @@
 #include "./NDArray.hpp"
 
 #include <cmath>
+#include <algorithm>
 
 namespace fesutils {
 
@@ -125,7 +126,9 @@ namespace fesutils {
                 if (coordinate[i] < this->min_vals[i] || coordinate[i] > this->max_vals[i]) {
                     return;
                 }
-                const int index = std::floor((coordinate[i] - this->min_vals[i])/this->bin_sizes[i]);
+                const long presumptive_index = static_cast<long>(std::floor((coordinate[i] - this->min_vals[i])/this->bin_sizes[i]));
+                const int index = std::min(presumptive_index, (this->dims[i] - 1));
+
                 indexes_buffer[i] = index;
             }
             this->grid_array->set(indexes_buffer, value);

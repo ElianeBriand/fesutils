@@ -33,9 +33,7 @@ namespace fesutils {
      */
     std::vector<size_t> find_fields_index_that_have_required_attribute_for_grid(const PlumedDatHeader& header);
 
-    /** Identify which field is likely to be the bias
-    */
-    std::optional<size_t> find_likely_bias_field_index(const PlumedDatHeader& header);
+
 
     /** Generate the grid tensor dimensions from the header.
      *

@@ -28,6 +28,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../grid/grid_utils.hpp"
+#include "../../file_reader/field_function_heuristics.hpp"
 
 #include "../MiscFixture.hpp"
 

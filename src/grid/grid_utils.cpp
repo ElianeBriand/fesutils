@@ -66,7 +66,8 @@ std::vector<double> fesutils::grid_bin_sizes_from_header(const fesutils::PlumedD
         }
         const double min_val = std::get<double>(field.attributes.at("min"));
         const double max_val = std::get<double>(field.attributes.at("max"));
-        const double bin_size = (max_val - min_val) / nbins;
+        const double range = (max_val - min_val);
+        const double bin_size = range / float(nbins);
         bin_sizes.push_back(bin_size);
     }
 
@@ -79,7 +80,7 @@ fesutils::extract_grid_min_val(const fesutils::PlumedDatHeader& header, const st
 
     for(const size_t& field_idx: which_fields) {
         const Field field = header.fields[field_idx];
-        const int min = std::get<double>(field.attributes.at("min"));
+        const double min = std::get<double>(field.attributes.at("min"));
         min_vals.push_back(min);
     }
     return min_vals;
@@ -91,7 +92,7 @@ fesutils::extract_grid_max_val(const fesutils::PlumedDatHeader& header, const st
 
     for(const size_t& field_idx: which_fields) {
         const Field field = header.fields[field_idx];
-        const int min = std::get<double>(field.attributes.at("max"));
+        const double min = std::get<double>(field.attributes.at("max"));
         min_vals.push_back(min);
     }
     return min_vals;
@@ -113,6 +114,8 @@ fesutils::compute_grid_bin_edges(const std::vector<double>& min_vals,
             edges.push_back(dim_min_val + j*bin_size);
         }
         edges.push_back(dim_max_val);
+
+
 
         // LCOV_EXCL_START
         // Reason for coverage exclusion: ought to be unreachable.
@@ -152,23 +155,4 @@ std::vector<std::vector<double>> fesutils::compute_grid_bin_center(const std::ve
     return bin_centers_all_dims;
 }
 
-std::optional<size_t> fesutils::find_likely_bias_field_index(const fesutils::PlumedDatHeader& header) {
-    std::optional<size_t> ret;
 
-    size_t number_of_hit = std::count_if(header.fields.begin(), header.fields.end(), [](const Field& f) {
-        return f.name.find(".bias") != std::string::npos; // Find field that has bias
-    });
-
-    if(number_of_hit == 0 || number_of_hit > 1) {
-        // No matching field, or more than 1: can't guess
-        return ret;
-    } else { // (number_of_hit == 1)
-        // Exactly one matching field: likely to be bias
-
-        auto it = std::find_if(header.fields.begin(), header.fields.end(), [](const Field& f) {
-            return f.name.find(".bias") != std::string::npos; // Find field that has bias
-        });
-
-        return std::optional<size_t>(std::distance(header.fields.begin(), it));
-    }
-}

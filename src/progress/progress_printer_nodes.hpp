@@ -23,8 +23,11 @@
 
 #include "progress_printer.hpp"
 
+
 namespace fesutils {
 
+    // LCOV_EXCL_START
+    // Reason for coverage exclusion: FIXME: Not counted correctly with LCOV/GCOV ?? Do not know why
     template<typename workPacketType>
     class progress_work_packet_registerer {
     public:
@@ -58,6 +61,8 @@ namespace fesutils {
     private:
         Progress_printer& progress_printer;
     };
+
+    // LCOV_EXCL_STOP
 
 }
 
