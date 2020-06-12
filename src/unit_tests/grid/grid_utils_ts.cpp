@@ -31,6 +31,7 @@
 #include "../../file_reader/field_function_heuristics.hpp"
 
 #include "../MiscFixture.hpp"
+#include "../../file_reader/read_file_header.hpp"
 
 namespace f = fesutils;
 namespace tt = boost::test_tools;

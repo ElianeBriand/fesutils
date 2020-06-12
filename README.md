@@ -15,13 +15,16 @@ Initialise submodules:
 git submodule update --init --recursive
 ```
 
-Build dependencies (`fmt` & `indicators`):
+Build dependencies (`fmt`, `yaml-cpp` & `indicators`):
 ```
 cd bundled-deps
 mkdir build-fmt && cd build-fmt
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../fmt
 make && make install
 cd ..
+mkdir build-yaml-cpp && cd build-yaml-cpp
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../yaml-cpp
+make && make install
 mkdir build-indicators && cd build-indicators
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../indicators
 make && make install
@@ -45,4 +48,5 @@ Must be installed:
 Bundled-in submodules:
 - indicator
 - fmt
+- yaml-cpp
 

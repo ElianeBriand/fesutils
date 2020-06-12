@@ -56,7 +56,7 @@ namespace fesutils {
 
         friend std::ostream& operator<<(std::ostream& os, const PlumedDatHeader& hd);
 
-        size_t find_field_index_from_name(const std::string& name);
+        [[nodiscard]] size_t find_field_index_from_name(const std::string& name) const;
 
         std::map<std::string, std::variant<bool, int, double>> attributes;
 

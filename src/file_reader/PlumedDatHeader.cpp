@@ -45,7 +45,7 @@ namespace fesutils {
         return os;
     }
 
-    size_t PlumedDatHeader::find_field_index_from_name(const std::string& name) {
+    size_t PlumedDatHeader::find_field_index_from_name(const std::string& name) const {
 
         auto it = std::find_if(this->fields.begin(), this->fields.end(), [&](const Field& f) {
             return f.name == name; // Find field that has bias

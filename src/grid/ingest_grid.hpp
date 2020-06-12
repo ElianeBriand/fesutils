@@ -38,8 +38,13 @@ namespace fesutils {
      */
     std::shared_ptr<Grid> ingest_fes_grid(const GeneralOptions& options,
                                           const std::string& grid_path,
-                                          PlumedDatHeader& header_grid,
+                                          const PlumedDatHeader& header_grid,
                                           const std::optional<std::string>& override_freenergy_field_name  = std::optional<std::string>());
+
+    std::shared_ptr<Grid> ingest_generic_grid(const GeneralOptions& options,
+                                              const std::string& grid_path,
+                                              const PlumedDatHeader& header_grid,
+                                              const size_t& value_index);
 
 }
 

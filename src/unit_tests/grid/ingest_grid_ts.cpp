@@ -113,52 +113,6 @@ BOOST_AUTO_TEST_SUITE(ingest_grid_ts)
             BOOST_TEST(val == 2.0);
         }
 
-        {
-            f::PlumedDatHeader header = f::read_cv_file_header(tempFile.getName());
-
-
-            std::shared_ptr<f::Grid> grid = f::ingest_fes_grid(generalOptions, tempFile.getName(), header, "unrelated");
-
-            BOOST_LOG_TRIVIAL(debug) << header;
-
-
-
-            BOOST_TEST(grid->num_dims == 1);
-            BOOST_REQUIRE(grid->dims.size() == 1);
-            BOOST_TEST(grid->dims[0] == 3);
-
-            BOOST_REQUIRE(grid->min_vals.size() == 1);
-            BOOST_TEST(grid->min_vals[0] == 0.1);
-
-            BOOST_REQUIRE(grid->max_vals.size() == 1);
-            BOOST_TEST(grid->max_vals[0] == 0.7);
-
-            BOOST_REQUIRE(grid->bin_sizes.size() == 1);
-            BOOST_TEST(grid->bin_sizes[0] == 0.2);
-
-            BOOST_REQUIRE(grid->bin_edges.size() == 1);
-            BOOST_TEST(grid->bin_edges[0][0] == 0.1);
-
-            std::vector<double> coord = {0.1};
-            double val = grid->get_inrange(coord);
-            BOOST_TEST(val == 8.2);
-
-            coord = {0.2};
-            val = grid->get_inrange(coord);
-            BOOST_TEST(val == 8.2);
-
-            coord = {0.358};
-            val = grid->get_inrange(coord);
-            BOOST_TEST(val == 9.2);
-
-            coord = {0.55};
-            val = grid->get_inrange(coord);
-            BOOST_TEST(val == 11.2);
-
-            coord = {0.49};
-            val = grid->get_inrange(coord);
-            BOOST_TEST(val == 9.2);
-        }
 
 
 

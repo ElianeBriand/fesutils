@@ -24,14 +24,12 @@
 #include <vector>
 
 #include "../file_reader/PlumedDatHeader.hpp"
+#include "Grid.hpp"
 
 
 namespace fesutils {
 
 
-    /** Identify which fields are grid dimensions
-     */
-    std::vector<size_t> find_fields_index_that_have_required_attribute_for_grid(const PlumedDatHeader& header);
 
 
 
@@ -67,6 +65,63 @@ namespace fesutils {
 
     // std::vector<taco::ModeFormatPack> all_dense_from_dims(const std::vector<int>& dims);
 
+    /** Increment indexes for axis value to traverse all grid points. Returns false when finished
+     *
+     * \param grid grid to traverse by indexes
+     * \param indexes a pre-allocated vector with N dims, same as grids
+     * \return true if increment successful, false if at the end of the traversal
+     */
+    template <typename T>
+    inline bool increment_grid_indexes(const Grid& grid, std::vector<T>& indexes) {
+        // Increment index
+        for(int curr_dim = 0; curr_dim < grid.num_dims; curr_dim++) {
+            // If current coordinate index lower than max index, increment this coordinate then go on to outer loop
+            if(indexes[curr_dim] < (grid.dims[curr_dim] - 1)) {
+                indexes[curr_dim]++;
+                break;
+            }else {
+                // Else : check if this is the last coordinate
+                if(curr_dim == (grid.num_dims - 1)) {
+                    // If it is, we are trying to increment last index past the end: we have finished enumerating indexes
+                    // end outer loop
+                    return false;
+                } else {
+                    // If it isn't, carry increment to next coordinate
+                    indexes[curr_dim] = 0;
+                }
+            }
+        }
+        return true;
+    }
+
+    /** Increment indexes for axis value to traverse all grid points. Returns false when finished
+ *
+ * \param grid grid to traverse by indexes
+ * \param indexes a pre-allocated vector with N dims, same as grids
+ * \return true if increment successful, false if at the end of the traversal
+ */
+    template <typename T>
+    inline bool increment_grid_indexes_last_first(const Grid& grid, std::vector<T>& indexes) {
+        // Increment index
+        for(int curr_dim = (grid.num_dims - 1); curr_dim >= 0; curr_dim--) {
+            // If current coordinate index lower than max index, increment this coordinate then go on to outer loop
+            if(indexes[curr_dim] < (grid.dims[curr_dim] - 1)) {
+                indexes[curr_dim]++;
+                break;
+            }else {
+                // Else : check if this is the last coordinate
+                if(curr_dim == 0) {
+                    // If it is, we are trying to increment last index past the end: we have finished enumerating indexes
+                    // end outer loop
+                    return false;
+                } else {
+                    // If it isn't, carry increment to next coordinate
+                    indexes[curr_dim] = 0;
+                }
+            }
+        }
+        return true;
+    }
 
 }
 

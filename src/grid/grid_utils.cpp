@@ -21,7 +21,7 @@
 #include "grid_utils.hpp"
 
 #include <boost/log/trivial.hpp>
-
+#include "../log_utils.hpp"
 
 std::vector<long int> fesutils::grid_dims_from_header(const fesutils::PlumedDatHeader& header, const std::vector<size_t>& which_fields) {
     std::vector<long int> dims;
@@ -39,21 +39,7 @@ std::vector<long int> fesutils::grid_dims_from_header(const fesutils::PlumedDatH
 }
 
 
-std::vector<size_t> fesutils::find_fields_index_that_have_required_attribute_for_grid(const fesutils::PlumedDatHeader& header) {
-    std::vector<size_t> indexes;
-    for(int i = 0; i < header.fields.size(); i++) {
-        const Field field = header.fields[i];
-        if( !field.attributes.count("min") ||
-        !field.attributes.count("max") ||
-        !field.attributes.count("nbins") ||
-        !field.attributes.count("periodic")) {
-            // Missing information to make the bins
-        }else {
-            indexes.push_back(i);
-        }
-    }
-    return indexes;
-}
+
 
 std::vector<double> fesutils::grid_bin_sizes_from_header(const fesutils::PlumedDatHeader& header, const std::vector<size_t>& which_fields) {
     std::vector<double> bin_sizes;
@@ -137,7 +123,7 @@ std::vector<std::vector<double>> fesutils::compute_grid_bin_center(const std::ve
         const std::vector<double>& bins = bin_edges[i];
         std::vector<double> bin_centers;
         for(int j = 1; j < bins.size(); j++) {
-            const double bin_center = (bins[j] + bins[j-1])/2;
+            const double bin_center = bins[j-1] + ((bins[j] - bins[j-1])/2);
             bin_centers.push_back(bin_center);
         }
 
@@ -150,7 +136,7 @@ std::vector<std::vector<double>> fesutils::compute_grid_bin_center(const std::ve
         }
         // LCOV_EXCL_STOP
 
-        bin_centers_all_dims.push_back(std::move(bin_centers));
+        bin_centers_all_dims.push_back(bin_centers);
     }
     return bin_centers_all_dims;
 }

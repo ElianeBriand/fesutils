@@ -28,6 +28,7 @@
 
 
 #include "grid_utils.hpp"
+#include "../file_reader/read_file_header.hpp"
 
 namespace fesutils {
 

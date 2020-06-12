@@ -32,6 +32,10 @@ namespace fesutils {
     struct reconstruct_from_fragments_args {
         std::vector<std::string> fragment_fes_paths;
 
+        std::string fragment_info_yaml_path;
+        std::string outfile_path;
+        std::string algorithm;
+
         std::optional<std::string> fefield;
     };
 

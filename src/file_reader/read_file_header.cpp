@@ -215,6 +215,10 @@ namespace fesutils {
 
     }
 
+
+
+
+
     void set_field_attribute(PlumedDatHeader& header, const std::string& attribute_name, const std::string& field_name, const std::string& value) {
         static const std::set<std::string> attribute_double = {"min", "max"};
         static const std::set<std::string> attribute_int = {"nbins"};
@@ -258,6 +262,48 @@ namespace fesutils {
             field_it->attributes[attribute_name] = attr_value;
         } else {
             BOOST_LOG_TRIVIAL(warning) << "Unhandled SET attribute" << attribute_name << " has been discarded.";
+        }
+    }
+
+    std::vector<size_t> find_fields_index_that_have_required_attribute_for_grid(const PlumedDatHeader& header) {
+        std::vector<size_t> indexes;
+        for(int i = 0; i < header.fields.size(); i++) {
+            const Field field = header.fields[i];
+            if(is_field_a_grid_dimension(field)) {
+                indexes.push_back(i);
+            }
+        }
+        return indexes;
+    }
+
+    void remove_nongrid_fields(PlumedDatHeader& header) {
+        // Loop until no more nongrid field are found
+        // (finding then removing list of not necessarily continous indices from vector is a bit tricky)
+
+        bool hasFoundNonGridField;
+        do {
+            hasFoundNonGridField = false;
+            for (int i = 0; i < header.fields.size(); i++) {
+                const Field field = header.fields[i];
+                if (!is_field_a_grid_dimension(field)) {
+                    // Missing attribute
+                    header.fields.erase(header.fields.begin() + i);
+                    hasFoundNonGridField = true;
+                    break; // Index i is ""invalidated"", better restart
+                }
+            }
+        } while(hasFoundNonGridField);
+    }
+
+    bool is_field_a_grid_dimension(const Field& field) {
+        if (!field.attributes.count("min") ||
+            !field.attributes.count("max") ||
+            !field.attributes.count("nbins") ||
+            !field.attributes.count("periodic")) {
+            // Missing attribute
+            return false;
+        } else {
+            return true;
         }
     }
 

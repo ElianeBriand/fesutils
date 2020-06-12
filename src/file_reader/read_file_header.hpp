@@ -84,6 +84,17 @@ namespace fesutils {
      */
     std::tuple<std::string, std::string> extract_attribute_field_from_attrfield(const std::string& attrfield);
 
+    /** Identify which fields are grid dimensions
+    */
+    std::vector<size_t> find_fields_index_that_have_required_attribute_for_grid(const PlumedDatHeader& header);
+
+    /** Is this field possibly a grid dimension ? From attribute presence
+    */
+    bool is_field_a_grid_dimension(const Field& field);
+
+    /** Remove fields that are not grid dimensions (lacking min/max/etc attributes)
+    */
+    void remove_nongrid_fields(PlumedDatHeader& header);
 
 }
 

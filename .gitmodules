@@ -4,3 +4,6 @@
 [submodule "bundled-deps/fmt"]
 	path = bundled-deps/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "bundled-deps/yaml-cpp"]
+	path = bundled-deps/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git

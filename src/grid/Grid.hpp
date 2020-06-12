@@ -68,7 +68,8 @@ namespace fesutils {
          */
         inline void set_inrange(const std::vector<double>& coordinate, const double& value, std::vector<long int>& indexes_buffer) {
             for(int i = 0; i < this->num_dims; i++) {
-                const int index = std::floor((coordinate[i] - this->min_vals[i])/this->bin_sizes[i]);
+                const long presumptive_index = static_cast<long>(std::floor((coordinate[i] - this->min_vals[i])/this->bin_sizes[i]));
+                const int index = std::min(presumptive_index, (this->dims[i] - 1));
                 indexes_buffer[i] = index;
             }
             this->grid_array->set(indexes_buffer, value);

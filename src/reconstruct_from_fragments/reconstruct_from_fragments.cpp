@@ -22,6 +22,9 @@
 #include "../grid/Grid.hpp"
 #include "../file_reader/read_file_header.hpp"
 #include "../grid/ingest_grid.hpp"
+#include "../fragment_info/parse_fragment_info_yaml.hpp"
+#include "reconstruction_verynaive.hpp"
+#include "../export/simple_opendx.hpp"
 
 #include <boost/log/trivial.hpp>
 
@@ -35,17 +38,49 @@ namespace fesutils {
     int do_reconstruct_from_fragments(GeneralOptions& options,
                                        const reconstruct_from_fragments_args& args) {
 
-        BOOST_LOG_TRIVIAL(info) << "Loading FES files: ";
+
+
+
+
+        BOOST_LOG_TRIVIAL(info) << "Fragment FES files             : ";
+        for(const std::string& grid_path: args.fragment_fes_paths) {
+            BOOST_LOG_TRIVIAL(info) << "                                 - " << grid_path;
+        }
+
+        BOOST_LOG_TRIVIAL(info) << "Output file                    : " << args.outfile_path;
+        BOOST_LOG_TRIVIAL(info) << "Reconstruction algorithm       : " << args.algorithm;
+        BOOST_LOG_TRIVIAL(info) << "Fragment information YAML      : " << args.fragment_info_yaml_path;
+
+        BOOST_LOG_TRIVIAL(info) << "";
+        BOOST_LOG_TRIVIAL(info) << "[Parsing fragment info]";
+
+        FragmentInfo fragmentInfo =  parse_fragment_info_yaml(args.fragment_info_yaml_path, args.fragment_fes_paths);
+        size_t num_fragments = fragmentInfo.fragments.size();
+        BOOST_LOG_TRIVIAL(info) << "Total number of fragments: " << num_fragments;
+        BOOST_LOG_TRIVIAL(info) << "";
+        BOOST_LOG_TRIVIAL(info) << "[Loading FES data]";
 
         std::vector<std::shared_ptr<Grid>> fes_grids;
         std::vector<PlumedDatHeader> fes_grid_headers;
-        for(const std::string& grid_path: args.fragment_fes_paths) {
-            BOOST_LOG_TRIVIAL(info) << "   -- " << grid_path << " -- ";
-            PlumedDatHeader header_grid =  read_cv_file_header(grid_path);
-            std::shared_ptr<Grid> p =  ingest_fes_grid(options, grid_path, header_grid, args.fefield);
-            fes_grid_headers.push_back(std::move(header_grid));
-            fes_grids.push_back(std::move(p));
+
+        for(auto & fragment : fragmentInfo.fragments) {
+            const std::string fes_path = fragment.path;
+            PlumedDatHeader header_grid =  read_cv_file_header(fes_path);
+            std::shared_ptr<Grid> p =  ingest_fes_grid(options, fes_path, header_grid, args.fefield);
+            fes_grid_headers.push_back(header_grid);
+            fes_grids.push_back(p);
         }
+
+        BOOST_LOG_TRIVIAL(info) << "";
+        BOOST_LOG_TRIVIAL(info) << "[Reconstructing]";
+
+
+        std::shared_ptr<Grid> result_grid = reconstruction_verynaive_algorithm(fes_grids, fes_grid_headers, fragmentInfo);
+
+        BOOST_LOG_TRIVIAL(info) << "";
+        BOOST_LOG_TRIVIAL(info) << "[Writing output]";
+
+        write_grid_to_opendx(*result_grid, args.outfile_path);
 
         BOOST_LOG_TRIVIAL(info) << "Done.";
         return 0;

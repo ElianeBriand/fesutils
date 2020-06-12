@@ -43,39 +43,53 @@ namespace fesutils {
 
     std::shared_ptr<Grid> ingest_fes_grid(const GeneralOptions& options,
                                             const std::string& grid_path,
-                                            PlumedDatHeader& header_grid,
+                                            const PlumedDatHeader& header_grid,
                                             const std::optional<std::string>& override_freenergy_field_name) {
+
+        BOOST_LOG_TRIVIAL(info) << "";
         BOOST_LOG_TRIVIAL(info) << "Ingesting FES data from grid file: " << grid_path;
 
-        std::shared_ptr<Grid> metad_grid = std::make_shared<Grid>(header_grid);
-
-
-        size_t num_fields_grid = header_grid.fields.size();
-
         size_t bias_idx = 0;
-        if(override_freenergy_field_name.has_value()) {
+        if (override_freenergy_field_name.has_value()) {
             bias_idx = header_grid.find_field_index_from_name(override_freenergy_field_name.value());
         } else {
-            std::optional<size_t> maybe_bias_indx =  find_likely_fenerg_field_index(header_grid);
-            if(!maybe_bias_indx.has_value()) {
-                BOOST_LOG_TRIVIAL(error) << "Could not identify free energy field. Please specify using argument --fefield";
+            std::optional<size_t> maybe_bias_indx = find_likely_fenerg_field_index(header_grid);
+            if (!maybe_bias_indx.has_value()) {
+                BOOST_LOG_TRIVIAL(error)
+                    << "Could not identify free energy field. Please specify using argument --fefield";
                 throw std::runtime_error("Could not identify free energy field.");
             }
             bias_idx = maybe_bias_indx.value();
         }
+        std::shared_ptr<Grid> fes_grid = ingest_generic_grid(options, grid_path,header_grid, bias_idx);
 
 
-        std::string binarydump_path = grid_path + ".bindump";
+        BOOST_LOG_TRIVIAL(info) << "Finished loading grid.";
+        BOOST_LOG_TRIVIAL(info) << "";
 
-        BOOST_LOG_TRIVIAL(info) << "Checking for previously-generated grid binary dump file: " << binarydump_path;
+        return fes_grid;
+    }
 
+        std::shared_ptr<Grid> ingest_generic_grid(const GeneralOptions& options,
+                                              const std::string& grid_path,
+                                              const PlumedDatHeader& header_grid,
+                                              const size_t& value_index) {
+
+            std::shared_ptr<Grid> generic_grid = std::make_shared<Grid>(header_grid);
+
+            size_t num_fields_grid = header_grid.fields.size();
+
+            std::string binarydump_path = grid_path + ".bindump";
+
+        BOOST_LOG_TRIVIAL(info) << "Checking for previously-generated grid binary dump file: " ;
+        BOOST_LOG_TRIVIAL(info) << "   " << binarydump_path;
         bool did_load = false;
         if(boost::filesystem::exists(binarydump_path)) {
             BOOST_LOG_TRIVIAL(info) << "Found. Loading...";
-            bool did_load = metad_grid->load_binrepr_from_file(binarydump_path);
+            did_load = generic_grid->load_binrepr_from_file(binarydump_path);
             if(did_load) {
                 BOOST_LOG_TRIVIAL(info) << "Successfully loaded binary dump file.";
-                BOOST_LOG_TRIVIAL(info) << "NB: delete/move this file to re-load from original data. (eg: if the file has changed)";
+                BOOST_LOG_TRIVIAL(info) << "    NB: delete/move this file to re-load from original file.";
             } else {
                 // LCOV_EXCL_START
                 // Reason for coverage exclusion: Will not unit test FS failure or file corruption for this routine
@@ -113,7 +127,7 @@ namespace fesutils {
 
             tbb::flow::function_node<std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>,
             tbb::flow::continue_msg> bias_grid_fill(g_grid, 1,
-                                                    grid_filler_node(metad_grid, bias_idx));
+                                                    grid_filler_node(generic_grid, value_index));
 
             tbb::flow::function_node<tbb::flow::continue_msg, tbb::flow::continue_msg> workpacket_done_reporter(g_grid,
                                                                                                                 1,
@@ -140,11 +154,10 @@ namespace fesutils {
             g_grid.wait_for_all();
             progress_printer.finish();
 
-            BOOST_LOG_TRIVIAL(info) << "";
-            BOOST_LOG_TRIVIAL(info) << "Finished loading free energy grid.";
+
 
             BOOST_LOG_TRIVIAL(info) << "Preparing to dump grid to binary file: " << binarydump_path;
-            bool did_dump = metad_grid->dump_binrepr_to_file(binarydump_path);
+            bool did_dump = generic_grid->dump_binrepr_to_file(binarydump_path);
             if(did_dump) {
                 BOOST_LOG_TRIVIAL(info) << "Successfully dumped grid. Next loading will be faster.";
             }else {
@@ -159,6 +172,6 @@ namespace fesutils {
         }
 
 
-        return metad_grid;
+        return generic_grid;
     }
 }

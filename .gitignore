@@ -10,3 +10,6 @@ build_cov/
 
 bundled-deps/deps-install
 bundled-deps/build-*
+
+*.bindump
+

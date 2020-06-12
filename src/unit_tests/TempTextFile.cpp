@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <boost/filesystem.hpp>
+
 TempTextFile::TempTextFile(const std::string& content) {
 
     this->raw_content = std::vector(content.size() + 1, (uint8_t) 0x66);
@@ -42,6 +44,14 @@ const char* TempTextFile::getNameCStr() {
 TempTextFile::~TempTextFile() {
     std::fclose(this->fds);
     std::remove(this->name.c_str());
+
+    // Check & remove bindumps:
+    std::string potential_bindump_name = this->name + ".bindump";
+    if(boost::filesystem::exists(potential_bindump_name)) {
+        std::remove(potential_bindump_name.c_str());
+    }
+
+
 }
 
 const std::vector<uint8_t>& TempTextFile::getRawData() {

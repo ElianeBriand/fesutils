@@ -188,6 +188,10 @@ int main(int argc, char** argv) {
 
                 args.fragment_fes_paths = vm["fragmentfes"].as< std::vector<std::string> >();
 
+                args.fragment_info_yaml_path = vm["fragmentinfo"].as< std::string >();
+                args.outfile_path = vm["outfile"].as< std::string >();
+                args.algorithm = vm["algorithm"].as< std::string >();
+
                 return f::do_reconstruct_from_fragments(options, args);
             }
 

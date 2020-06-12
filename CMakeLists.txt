@@ -62,7 +62,8 @@ link_directories(./bundled-deps/deps-install/lib64)
 
 
 set(PCH_HEADER_LIST
-        src/file_reader/PlumedDatHeader.hpp)
+        src/file_reader/PlumedDatHeader.hpp
+        src/log_utils.hpp)
 
 set(PCH_SYST_HEADER_LIST
         <string>
@@ -76,7 +77,9 @@ set(PCH_SYST_HEADER_LIST
         <fmt/format.h>
         <boost/log/trivial.hpp>
         <Eigen/Dense>
-        <stdexcept>)
+        <stdexcept>
+        <yaml-cpp/yaml.h>
+        )
 
 set(SOURCE_LIST src/GeneralOptions.cpp
                 src/GeneralOptions.h
@@ -102,9 +105,9 @@ set(SOURCE_LIST src/GeneralOptions.cpp
                 src/grid/grid_utils.cpp
                 src/grid/grid_utils.hpp
                 src/grid/Grid.cpp
-                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp src/grid/grid_filler_node.cpp src/grid/grid_filler_node.hpp src/progress/progress_printer.cpp src/progress/progress_printer.hpp src/progress/progress_printer_nodes.hpp src/reconstruct_from_fragments/reconstruct_from_fragments.cpp src/reconstruct_from_fragments/reconstruct_from_fragments.hpp src/grid/ingest_grid.cpp src/grid/ingest_grid.hpp src/file_reader/field_function_heuristics.cpp src/file_reader/field_function_heuristics.hpp)
+                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp src/grid/grid_filler_node.cpp src/grid/grid_filler_node.hpp src/progress/progress_printer.cpp src/progress/progress_printer.hpp src/progress/progress_printer_nodes.hpp src/reconstruct_from_fragments/reconstruct_from_fragments.cpp src/reconstruct_from_fragments/reconstruct_from_fragments.hpp src/grid/ingest_grid.cpp src/grid/ingest_grid.hpp src/file_reader/field_function_heuristics.cpp src/file_reader/field_function_heuristics.hpp src/fragment_info/parse_fragment_info_yaml.cpp src/fragment_info/parse_fragment_info_yaml.hpp src/fragment_info/FragmentInfo.cpp src/fragment_info/FragmentInfo.hpp src/fragment_info/FragmentInfo_Utils.cpp src/fragment_info/FragmentInfo_Utils.hpp src/reconstruct_from_fragments/reconstruction_verynaive.cpp src/reconstruct_from_fragments/reconstruction_verynaive.hpp src/reconstruct_from_fragments/reconstruction_utils.cpp src/reconstruct_from_fragments/reconstruction_utils.hpp src/log_utils.hpp src/export/simple_opendx.cpp src/export/simple_opendx.hpp)
 
-set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt)
+set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt yaml-cpp)
 
 
 add_executable(fesutils src/cli_frontend.cpp ${SOURCE_LIST})

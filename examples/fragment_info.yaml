@@ -1,0 +1,17 @@
+# Fragment info example
+
+whole_molecule:
+    name: "Methylphenidate"
+    shortname: "MPH"
+    
+fragments:
+    - meac:
+        name: "Methylacetate"
+        filename_hint: "meac_raw_hills.dat"
+        geometry:
+            single_coord: [0.0, 2.0, 0.0]
+    - bzn:
+        name: "Benzene"
+        filename_hint: "benzene_raw_hills.dat"
+        geometry:
+            single_coord: [0.0, -2.0, 0.0]
