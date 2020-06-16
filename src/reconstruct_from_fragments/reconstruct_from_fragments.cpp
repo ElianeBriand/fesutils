@@ -82,6 +82,9 @@ namespace fesutils {
         }else if (args.algorithm == "verynaive_conformerrotation") {
             result_grid = reconstruction_verynaive_conformerrotation_algorithm(fes_grids, fes_grid_headers,
                                                                                fragmentInfo);
+        }else if (args.algorithm == "verynaive_multiconfrotation") {
+            result_grid = reconstruction_verynaive_multiconfrotation_algorithm(fes_grids, fes_grid_headers,
+                                                                               fragmentInfo);
         }else {
             BOOST_LOG_TRIVIAL(info) << "Unknown algorithm: " << args.algorithm;
             throw std::runtime_error("Unknown algorithm");

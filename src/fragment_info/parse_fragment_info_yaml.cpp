@@ -111,20 +111,50 @@ namespace fesutils {
         std::string geom_type = iter->first.as<std::string>();
 
         if(geom_type == "single_coord") {
-            if(iter->second.Type() == YAML::NodeType::Sequence && iter->second.size() == 3) {
-                FragmentRelativeGeometry frg =  FragmentRelativeGeometry_factory(FragmentRelativeGeometryType::SingleCoord);
+            if (iter->second.Type() == YAML::NodeType::Sequence && iter->second.size() == 3) {
+                FragmentRelativeGeometry frg = FragmentRelativeGeometry_factory(
+                        FragmentRelativeGeometryType::SingleCoord);
                 FragGeo_SingleCoord* data = dynamic_cast<FragGeo_SingleCoord*>(frg.internal_data.get());
                 assert(data != nullptr);
-                try  {
-                    data->coord = { iter->second[0].as<double>() ,iter->second[1].as<double>(), iter->second[2].as<double>() };
+                try {
+                    data->coord = {iter->second[0].as<double>(), iter->second[1].as<double>(),
+                                   iter->second[2].as<double>()};
                 }
-                catch(...) {
+                catch (...) {
                     BOOST_LOG_TRIVIAL(error) << "Could not read coordinate vector: \"" << iter->second << "\"";
                     return;
                 }
                 curr_fragment.relativeGeometries[FragmentRelativeGeometryType::SingleCoord] = frg;
             } else {
-                BOOST_LOG_TRIVIAL(error) << "Fragment geometry type single_coord require a 3D position vector argument (like \"[2.4, 12.0, -1.2]\")";
+                BOOST_LOG_TRIVIAL(error)
+                    << "Fragment geometry type single_coord require a 3D position vector argument (like \"[2.4, 12.0, -1.2]\")";
+                return;
+            }
+        }else if(geom_type == "multiple_conformer_coord") {
+            if (iter->second.Type() == YAML::NodeType::Sequence && iter->second.size() > 1) {
+                BOOST_LOG_TRIVIAL(debug)
+                    << "AAAA";
+                FragmentRelativeGeometry frg = FragmentRelativeGeometry_factory(
+                        FragmentRelativeGeometryType::MultipleConformerCoord);
+                FragGeo_MultipleConformerCoord* data = dynamic_cast<FragGeo_MultipleConformerCoord*>(frg.internal_data.get());
+                assert(data != nullptr);
+                BOOST_LOG_TRIVIAL(debug)
+                    << iter->second.size();
+                for(int j = 0; j < iter->second.size(); j++) {
+                    if (iter->second[j].Type() == YAML::NodeType::Sequence && iter->second[j].size() == 3) {
+                        std::array<double, 3> one_coord = {iter->second[j][0].as<double>(), iter->second[j][1].as<double>(),
+                                                           iter->second[j][2].as<double>()};
+                        data->coords.push_back(one_coord);
+                    } else {
+                        BOOST_LOG_TRIVIAL(error)
+                            << "Fragment geometry type multiple_conformer_coord require a list of multiple 3D position vector argument (cannot parse position vector: "<< iter->as<std::string>() <<" )";
+                        return;
+                    }
+                }
+                curr_fragment.relativeGeometries[FragmentRelativeGeometryType::MultipleConformerCoord] = frg;
+            } else {
+                BOOST_LOG_TRIVIAL(error)
+                    << "Fragment geometry type multiple_conformer_coord require a list of multiple 3D position vector argument (not a sequence of multiple vector)";
                 return;
             }
         } else {

@@ -33,8 +33,10 @@ namespace fesutils {
 
         if(geom_type == FragmentRelativeGeometryType::SingleCoord) {
             frgeom.type = FragmentRelativeGeometryType::SingleCoord;
-            frgeom.internal_data =  std::make_shared<FragGeo_SingleCoord>();
-
+            frgeom.internal_data = std::make_shared<FragGeo_SingleCoord>();
+        }else if(geom_type == FragmentRelativeGeometryType::MultipleConformerCoord) {
+            frgeom.type = FragmentRelativeGeometryType::MultipleConformerCoord;
+            frgeom.internal_data = std::make_shared<FragGeo_MultipleConformerCoord>();
         } else {
             BOOST_LOG_TRIVIAL(error) << "Unknown fragment relative geometry type. Cannot fabricate object of the appropriate object.";
             throw std::runtime_error("Unknown fragment relative geometry type");
@@ -86,5 +88,18 @@ namespace fesutils {
             os << "unknown_fragment_relative_geometry";
         }
         return os;
+    }
+
+    FragGeo_MultipleConformerCoord::FragGeo_MultipleConformerCoord() {
+
+    }
+
+    FragGeo_MultipleConformerCoord::~FragGeo_MultipleConformerCoord() {
+
+    }
+
+    std::string FragGeo_MultipleConformerCoord::to_string() {
+        std::string ret = fmt::format("MultipleConformerCoord : {} conformers\n", this->coords.size());
+        return ret;
     }
 }

@@ -30,7 +30,8 @@
 namespace fesutils {
 
     enum FragmentRelativeGeometryType {
-        SingleCoord
+        SingleCoord,
+        MultipleConformerCoord
     };
 
     struct FragmentRelativeGeometry_internalData {
@@ -42,6 +43,14 @@ namespace fesutils {
         FragGeo_SingleCoord();
         std::array<double, 3> coord;
         virtual ~FragGeo_SingleCoord();
+
+        virtual std::string to_string();
+    };
+
+    struct FragGeo_MultipleConformerCoord : public FragmentRelativeGeometry_internalData {
+        FragGeo_MultipleConformerCoord();
+        std::vector<std::array<double, 3>> coords;
+        virtual ~FragGeo_MultipleConformerCoord();
 
         virtual std::string to_string();
     };
