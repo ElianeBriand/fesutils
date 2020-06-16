@@ -9,9 +9,14 @@ fragments:
         name: "Methylacetate"
         filename_hint: "meac_raw_hills.dat"
         geometry:
-            single_coord: [0.0, 2.0, 0.0]
+            single_coord: [-0.309, 0.913, 1.132]
     - bzn:
         name: "Benzene"
         filename_hint: "benzene_raw_hills.dat"
         geometry:
-            single_coord: [0.0, -2.0, 0.0]
+            single_coord: [-1.374, -2.547, 0.510]
+    - pip:
+        name: "Piperidine"
+        filename_hint: "piperidine_raw_hills.dat"
+        geometry:
+            single_coord: [-0.232, 0.647, -1.416]

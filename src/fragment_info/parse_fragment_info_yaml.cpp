@@ -122,7 +122,7 @@ namespace fesutils {
                     BOOST_LOG_TRIVIAL(error) << "Could not read coordinate vector: \"" << iter->second << "\"";
                     return;
                 }
-                curr_fragment.relativeGeometries.push_back(frg);
+                curr_fragment.relativeGeometries[FragmentRelativeGeometryType::SingleCoord] = frg;
             } else {
                 BOOST_LOG_TRIVIAL(error) << "Fragment geometry type single_coord require a 3D position vector argument (like \"[2.4, 12.0, -1.2]\")";
                 return;

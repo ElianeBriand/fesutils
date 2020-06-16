@@ -52,8 +52,8 @@ namespace fesutils {
             os << std::string("          File hint: ") + fragment.filename_hint << "\n";
             os << std::string("          File path: ") + fragment.path << "\n";
             os << std::string("          Relative geometries (") << fragment.relativeGeometries.size() << "):\n";
-            for(const FragmentRelativeGeometry& fragment: fragment.relativeGeometries) {
-                os << std::string("            - ") <<fragment.internal_data->to_string() << "\n";
+            for(const auto & relativeGeometryMapPair : fragment.relativeGeometries) {
+                os << std::string("            - ") <<relativeGeometryMapPair.first << " = " << relativeGeometryMapPair.second.internal_data->to_string() << "\n";
             }
         }
 
@@ -77,5 +77,14 @@ namespace fesutils {
 
     std::string FragmentRelativeGeometry_internalData::to_string() {
         return std::string("Base class FragmentRelativeGeometry_internalData");
+    }
+
+    std::ostream& operator<<(std::ostream& os, const FragmentRelativeGeometryType& frgtype) {
+        if(frgtype == FragmentRelativeGeometryType::SingleCoord) {
+            os << "single_coord";
+        } else {
+            os << "unknown_fragment_relative_geometry";
+        }
+        return os;
     }
 }

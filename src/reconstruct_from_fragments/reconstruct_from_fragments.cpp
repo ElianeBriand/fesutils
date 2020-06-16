@@ -39,11 +39,8 @@ namespace fesutils {
                                        const reconstruct_from_fragments_args& args) {
 
 
-
-
-
         BOOST_LOG_TRIVIAL(info) << "Fragment FES files             : ";
-        for(const std::string& grid_path: args.fragment_fes_paths) {
+        for (const std::string& grid_path: args.fragment_fes_paths) {
             BOOST_LOG_TRIVIAL(info) << "                                 - " << grid_path;
         }
 
@@ -54,7 +51,7 @@ namespace fesutils {
         BOOST_LOG_TRIVIAL(info) << "";
         BOOST_LOG_TRIVIAL(info) << "[Parsing fragment info]";
 
-        FragmentInfo fragmentInfo =  parse_fragment_info_yaml(args.fragment_info_yaml_path, args.fragment_fes_paths);
+        FragmentInfo fragmentInfo = parse_fragment_info_yaml(args.fragment_info_yaml_path, args.fragment_fes_paths);
         size_t num_fragments = fragmentInfo.fragments.size();
         BOOST_LOG_TRIVIAL(info) << "Total number of fragments: " << num_fragments;
         BOOST_LOG_TRIVIAL(info) << "";
@@ -63,10 +60,10 @@ namespace fesutils {
         std::vector<std::shared_ptr<Grid>> fes_grids;
         std::vector<PlumedDatHeader> fes_grid_headers;
 
-        for(auto & fragment : fragmentInfo.fragments) {
+        for (auto& fragment : fragmentInfo.fragments) {
             const std::string fes_path = fragment.path;
-            PlumedDatHeader header_grid =  read_cv_file_header(fes_path);
-            std::shared_ptr<Grid> p =  ingest_fes_grid(options, fes_path, header_grid, args.fefield);
+            PlumedDatHeader header_grid = read_cv_file_header(fes_path);
+            std::shared_ptr<Grid> p = ingest_fes_grid(options, fes_path, header_grid, args.fefield);
             fes_grid_headers.push_back(header_grid);
             fes_grids.push_back(p);
         }
@@ -74,8 +71,22 @@ namespace fesutils {
         BOOST_LOG_TRIVIAL(info) << "";
         BOOST_LOG_TRIVIAL(info) << "[Reconstructing]";
 
+        BOOST_LOG_TRIVIAL(info) << "Using algorithm: " << args.algorithm;
+        std::shared_ptr<Grid> result_grid;
+        if (args.algorithm == "verynaive") {
+            result_grid = reconstruction_verynaive_algorithm(fes_grids, fes_grid_headers,
+                                                                                   fragmentInfo);
+        } else if (args.algorithm == "verynaive_withdisplacement") {
+            result_grid = reconstruction_verynaive_withdisplacement_algorithm(fes_grids, fes_grid_headers,
+                                                                              fragmentInfo);
+        }else if (args.algorithm == "verynaive_conformerrotation") {
+            result_grid = reconstruction_verynaive_conformerrotation_algorithm(fes_grids, fes_grid_headers,
+                                                                               fragmentInfo);
+        }else {
+            BOOST_LOG_TRIVIAL(info) << "Unknown algorithm: " << args.algorithm;
+            throw std::runtime_error("Unknown algorithm");
+        }
 
-        std::shared_ptr<Grid> result_grid = reconstruction_verynaive_algorithm(fes_grids, fes_grid_headers, fragmentInfo);
 
         BOOST_LOG_TRIVIAL(info) << "";
         BOOST_LOG_TRIVIAL(info) << "[Writing output]";

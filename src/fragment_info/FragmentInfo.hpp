@@ -25,6 +25,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <map>
 
 namespace fesutils {
 
@@ -66,7 +67,7 @@ namespace fesutils {
             std::string filename_hint; // filename as in the YAML file
             std::string path;          // actual file path
 
-            std::vector<FragmentRelativeGeometry> relativeGeometries;
+            std::map<FragmentRelativeGeometryType, FragmentRelativeGeometry> relativeGeometries;
         };
 
         std::string name;
@@ -76,6 +77,8 @@ namespace fesutils {
     };
 
     std::ostream& operator<<(std::ostream& os, const FragmentInfo& fi);
+
+    std::ostream& operator<<(std::ostream& os, const FragmentRelativeGeometryType& frgtype);
 
 }
 
