@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "../file_reader/PlumedDatHeader.hpp"
-#include "Grid.hpp"
+
 
 
 namespace fesutils {
@@ -71,6 +71,7 @@ namespace fesutils {
      * \param indexes a pre-allocated vector with N dims, same as grids
      * \return true if increment successful, false if at the end of the traversal
      */
+     /*
     template <typename T>
     inline bool increment_grid_indexes(const Grid& grid, std::vector<T>& indexes) {
         // Increment index
@@ -93,13 +94,14 @@ namespace fesutils {
         }
         return true;
     }
-
+*/
     /** Increment indexes for axis value to traverse all grid points. Returns false when finished
  *
  * \param grid grid to traverse by indexes
  * \param indexes a pre-allocated vector with N dims, same as grids
  * \return true if increment successful, false if at the end of the traversal
  */
+ /*
     template <typename T>
     inline bool increment_grid_indexes_last_first(const Grid& grid, std::vector<T>& indexes) {
         // Increment index
@@ -122,6 +124,7 @@ namespace fesutils {
         }
         return true;
     }
+    */
 
 }
 

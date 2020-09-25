@@ -29,12 +29,40 @@ namespace fesutils {
     struct FileIOPerfOptions {
         size_t binaryFileReadBufferSize = 1024 * 1024;
 
-
-        FileIOPerfOptions() = default;
     };
+
+    enum class LogLevel {
+        debug,
+        info,
+        warning,
+        error
+    };
+
+
+
+    LogLevel string_to_LogLevel(const std::string& loglevel_as_str);
+    std::string logLevel_to_string(const LogLevel& loglevel);
+
+
+    enum class BinaryCachePolicy {
+        always,
+        //checktimestamp,
+        never
+    };
+
+    BinaryCachePolicy string_to_BinaryCachePolicy(const std::string& binaryCachePolicy_as_str);
+    std::string binaryCachePolicy_to_string(const BinaryCachePolicy& binaryCachePolicy);
+
+
 
     struct GeneralOptions {
 
+        std::string run_title = "Untitled";
+        LogLevel loglevel = LogLevel::info;
+        BinaryCachePolicy binaryCachePolicy = BinaryCachePolicy::never;
+        bool ui_bling = false;
+
+        std::map<std::string, std::string> search_directory;
 
         // Performance tuning
 

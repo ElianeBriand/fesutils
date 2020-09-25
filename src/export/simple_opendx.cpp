@@ -12,6 +12,7 @@
 
 namespace fesutils {
 
+    /*
     namespace {
         std::string dims_number_string(const fesutils::Grid& grid) {
             std::string ret;
@@ -55,9 +56,11 @@ namespace fesutils {
         }
     }
 
+     */
 
 
 
+/*
     void write_grid_to_opendx(const fesutils::Grid& grid, const std::string& filename) {
 
         BOOST_LOG_TRIVIAL(info) << "Writing OpenDx file " << filename;
@@ -106,5 +109,6 @@ namespace fesutils {
         BOOST_LOG_TRIVIAL(info) << "Done writing file.";
 
     }
+    */
 }
 

@@ -32,7 +32,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../progress/progress_printer.hpp"
-#include "../../progress/progress_printer_nodes.hpp"
+
 
 namespace f = fesutils;
 namespace tt = boost::test_tools;
@@ -41,75 +41,55 @@ namespace tt = boost::test_tools;
 BOOST_AUTO_TEST_SUITE(progress_printer_ts)
 
     BOOST_AUTO_TEST_CASE(progress_printer_total_tc) {
-        f::Progress_printer p;
+        f::ProgressPrinter p;
 
-        BOOST_TEST(p.get_work_packet_total_count() == 0);
+        BOOST_TEST(p.get_todo_count() == 0);
+        BOOST_TEST(p.get_done_count() == 0);
+        BOOST_TEST(p.get_inflight_count() == 0);
 
-        p.increment_workpacket_total_count();
+        p.add_to_todo_count(120);
 
-        BOOST_TEST(p.get_work_packet_total_count() == 1);
+        BOOST_TEST(p.get_todo_count() == 120);
 
-        p.finish();
-    }
+        p.substract_from_todo_count(10);
 
-    BOOST_AUTO_TEST_CASE(progress_printer_done_tc) {
-        f::Progress_printer p;
+        BOOST_TEST(p.get_todo_count() == 110);
 
-        BOOST_TEST(p.get_work_packet_done_count() == 0);
+        p.set_todo_count(240);
 
-        p.increment_workpacket_done_count();
+        BOOST_TEST(p.get_todo_count() == 240);
 
-        BOOST_TEST(p.get_work_packet_done_count() == 1);
+        p.add_to_inflight_count(20);
 
-        p.finish();
-    }
+        BOOST_TEST(p.get_inflight_count() == 20);
 
-    BOOST_AUTO_TEST_CASE(progress_printer_exercice_printing_tc) {
-        f::Progress_printer p;
+        p.increment_inflight_count();
 
-        BOOST_TEST(p.get_work_packet_done_count() == 0);
-        BOOST_TEST(p.get_work_packet_total_count() == 0);
+        BOOST_TEST(p.get_inflight_count() == 21);
 
-        p.increment_workpacket_total_count();
-        p.increment_workpacket_total_count();
-        p.increment_workpacket_total_count();
-        p.increment_workpacket_total_count();
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        p.decrement_inflight_count();
 
-        BOOST_TEST(p.get_work_packet_done_count() == 0);
-        BOOST_TEST(p.get_work_packet_total_count() == 4);
+        BOOST_TEST(p.get_inflight_count() == 20);
 
-        p.increment_workpacket_done_count();
-        p.increment_workpacket_done_count();
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        p.substract_from_inflight_count(4);
 
-        BOOST_TEST(p.get_work_packet_done_count() == 2);
-        BOOST_TEST(p.get_work_packet_total_count() == 4);
+        BOOST_TEST(p.get_inflight_count() == 16);
 
-        p.finish();
-    }
+        p.increment_done_count();
 
-    BOOST_AUTO_TEST_CASE(progress_printer_node_wp__tc) {
-        f::Progress_printer p;
+        BOOST_TEST(p.get_done_count() == 1);
 
-        BOOST_TEST(p.get_work_packet_done_count() == 0);
-        BOOST_TEST(p.get_work_packet_total_count() == 0);
+        p.add_to_done_count(15);
 
-        f::progress_work_packet_registerer<tbb::flow::continue_msg> reg_node(p);
+        BOOST_TEST(p.get_done_count() == 16);
 
-        f::progress_work_packet_done_reporter<tbb::flow::continue_msg> done_node(p);
+        p.substract_from_done_count(3);
 
-        reg_node(tbb::flow::continue_msg());
+        BOOST_TEST(p.get_done_count() == 13);
 
-        BOOST_TEST(p.get_work_packet_done_count() == 0);
-        BOOST_TEST(p.get_work_packet_total_count() == 1);
-
-        done_node(tbb::flow::continue_msg());
-
-        BOOST_TEST(p.get_work_packet_done_count() == 1);
-        BOOST_TEST(p.get_work_packet_total_count() == 1);
 
         p.finish();
     }
+
 
 BOOST_AUTO_TEST_SUITE_END();

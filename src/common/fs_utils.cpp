@@ -26,27 +26,34 @@ namespace fesutils {
 
     bool path_exists_isfile(const std::string& filepath) {
         boost::filesystem::path p(filepath);
+        return fesutils::path_exists_isfile(p);
+    }
 
-        if (exists(p) && is_regular_file(p))
+    std::string path_notfile_whatistheproblem(const std::string& filepath) {
+        boost::filesystem::path p(filepath);
+        return fesutils::path_notfile_whatistheproblem(p);
+    }
+
+    bool path_exists_isfile(const bf::path& filepath) {
+        if (exists(filepath) && is_regular_file(filepath))
             return true;
         else
             return false;
     }
 
-    std::string path_notfile_whatistheproblem(const std::string& filepath) {
-        boost::filesystem::path p(filepath);
+    std::string path_notfile_whatistheproblem(const bf::path& filepath) {
 
-        if(!exists(p)) {
+        if(!exists(filepath)) {
             return "path does not exist";
         }
 
         // LCOV_EXCL_START
         // Reason for coverage exclusion: not worth time to mockup
 
-        if(is_directory(p)) {
+        if(is_directory(filepath)) {
             return "path is a directory, not a file";
         }
-        if(!is_regular_file(p))  {
+        if(!is_regular_file(filepath))  {
             return "file is not a regular file";
         }
 

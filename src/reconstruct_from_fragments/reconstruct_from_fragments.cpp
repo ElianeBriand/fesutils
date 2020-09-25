@@ -19,12 +19,7 @@
  */
 
 #include "reconstruct_from_fragments.hpp"
-#include "../grid/Grid.hpp"
-#include "../file_reader/read_file_header.hpp"
-#include "../grid/ingest_grid.hpp"
-#include "../fragment_info/parse_fragment_info_yaml.hpp"
-#include "reconstruction_verynaive.hpp"
-#include "../export/simple_opendx.hpp"
+
 
 #include <boost/log/trivial.hpp>
 
@@ -37,7 +32,7 @@ namespace fesutils {
 
     int do_reconstruct_from_fragments(GeneralOptions& options,
                                        const reconstruct_from_fragments_args& args) {
-
+/*
 
         BOOST_LOG_TRIVIAL(info) << "Fragment FES files             : ";
         for (const std::string& grid_path: args.fragment_fes_paths) {
@@ -97,6 +92,7 @@ namespace fesutils {
         write_grid_to_opendx(*result_grid, args.outfile_path);
 
         BOOST_LOG_TRIVIAL(info) << "Done.";
+        */
         return 0;
     }
 

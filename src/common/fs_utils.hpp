@@ -23,24 +23,45 @@
 
 #include <string>
 
+#include <boost/filesystem.hpp>
+namespace bf = boost::filesystem;
+
 namespace fesutils {
 
     /**
      * Check if a path exist, and is a normal file
-     * \param filepath path to check
+     * \param filepath path string to check
      * \return true if the file exists and is a normal file
      */
     bool path_exists_isfile(const std::string& filepath);
+
+    /**
+     * Check if a path exist, and is a normal file
+     * \param filepath boost::filesystem path to check
+     * \return true if the file exists and is a normal file
+     */
+    bool path_exists_isfile(const bf::path& filepath);
 
     /** Return an error message for why the file could not be opened.
      *
      * PRECONDITION: path_exists_isfile called on filepath, returned false
      *
-     * \param filepath path to check
+     * \param filepath path string to check
      * \return a string containing the error message
      * \sa path_exists_isfile
      */
     std::string path_notfile_whatistheproblem(const std::string& filepath);
+
+    /** Return an error message for why the file could not be opened.
+     *
+     * PRECONDITION: path_exists_isfile called on filepath, returned false
+     *
+     * \param filepath boost::filesystem path to check
+     * \return a string containing the error message
+     * \sa path_exists_isfile
+     */
+    std::string path_notfile_whatistheproblem(const bf::path& filepath);
+
 
 }
 

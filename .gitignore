@@ -13,3 +13,6 @@ bundled-deps/build-*
 
 *.bindump
 
+.~lock*
+*/.ipynb_checkpoints/
+

@@ -20,57 +20,82 @@
 
 #include <iostream>
 #include <chrono>
+#include <locale>
+
+#include <fmt/format.h>
+#include <fmt/locale.h>
 
 #include "progress_printer.hpp"
+#include "../frontend_common.h"
 
 namespace fesutils {
-    Progress_printer::Progress_printer() :
-            work_packet_total_count(0),
-            work_packet_done_count(0),
-            printer_thread_continue(true),
-            printer_thread(&Progress_printer::actual_printer_thread_func, this)
+    ProgressPrinter::ProgressPrinter()
     {
-        this->work_packet_total_count.store(0,std::memory_order_release);
-        this->work_packet_done_count.store(0,std::memory_order_release);
+        this->space_prefix = non_boost_log_get_space_prefix();
+        this->todo_count.store(0,std::memory_order_release);
+        this->inflight_count.store(0,std::memory_order_release);
+        this->done_count.store(0,std::memory_order_release);
         this->printer_thread_continue.store(true,std::memory_order_release);
+        this->printer_thread = std::thread(&ProgressPrinter::actual_printer_thread_func, this);
     }
 
-    void Progress_printer::actual_printer_thread_func() {
-        long int last_total_wp = this->work_packet_total_count.load(std::memory_order_acquire);
-        long int last_done_wp = this->work_packet_done_count.load(std::memory_order_acquire);
+    void ProgressPrinter::actual_printer_thread_func() {
+
+        long int last_todo_count = this->todo_count.load(std::memory_order_acquire);
+        long int last_inflight_count = this->inflight_count.load(std::memory_order_acquire);
+        long int last_done_count = this->done_count.load(std::memory_order_acquire);
         bool shouldPrint = true;
+
         while(true) {
             if(! this->printer_thread_continue.load(std::memory_order_acquire)) {
                 break;
             }
-            long int total_wp = this->work_packet_total_count.load(std::memory_order_acquire);
-            long int done_wp = this->work_packet_done_count.load(std::memory_order_acquire);
-            if(last_total_wp != total_wp){
-                last_total_wp = total_wp;
+
+            long int local_todo_count = this->todo_count.load(std::memory_order_acquire);
+            long int local_inflight_count = this->inflight_count.load(std::memory_order_acquire);
+            long int local_done_count = this->done_count.load(std::memory_order_acquire);
+            if(last_todo_count != local_todo_count){
+                last_todo_count = local_todo_count;
                 shouldPrint = true;
             }
-            if(last_done_wp != done_wp){
-                last_done_wp = done_wp;
+            if(last_inflight_count != local_inflight_count){
+                last_inflight_count = local_inflight_count;
                 shouldPrint = true;
             }
+            if(last_done_count != local_done_count){
+                last_done_count = local_done_count;
+                shouldPrint = true;
+            }
+
             if(shouldPrint) {
-                std::cout << "\rProgress | done: " << done_wp << " | total: " << total_wp;
+                std::string progress_line = fmt::format(std::locale("en_US.UTF-8"),
+                                                       "{:s}Progress | todo: {:L} | inflight: {:L} | done: {:L}      ",
+                                                        this->space_prefix, local_todo_count, local_inflight_count, local_done_count );
+
+                std::cout << "\r" << progress_line;
                 shouldPrint = false;
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
+
         }
     }
 
-    void Progress_printer::finish() {
+    void ProgressPrinter::finish() {
         this->printer_thread_continue.store(false,std::memory_order_release);
         this->printer_thread.join();
+
+        long int local_todo_count = this->todo_count.load(std::memory_order_acquire);
+        long int local_inflight_count = this->inflight_count.load(std::memory_order_acquire);
+        long int local_done_count = this->done_count.load(std::memory_order_acquire);
+        std::string progress_line = fmt::format(std::locale("en_US.UTF-8"),
+                                                "{:s}Progress | todo: {:L} | inflight: {:L} | done: {:L} | Finished      ",
+                                                this->space_prefix, local_todo_count, local_inflight_count, local_done_count );
+        std::cout << "\r" << progress_line;
         std::cout << std::endl;
-        std::cout << "Progress | Finished | Work packet total: " << this->work_packet_total_count.load(std::memory_order_acquire) << " | ";
-        std::cout << "done: " << this->work_packet_done_count.load(std::memory_order_acquire) << std::endl;
-        std::cout << std::endl;
+
     }
 
-    Progress_printer::~Progress_printer() {
+    ProgressPrinter::~ProgressPrinter() {
         bool continue_status = this->printer_thread_continue.load(std::memory_order_acquire);
         if(continue_status) {
             // LCOV_EXCL_START

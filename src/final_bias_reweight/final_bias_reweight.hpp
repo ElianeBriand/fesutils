@@ -24,14 +24,18 @@
 #include <string>
 #include <optional>
 
+#include <boost/filesystem.hpp>
+namespace bf = boost::filesystem;
+
+
 #include "../GeneralOptions.h"
 
 
 namespace fesutils {
 
     struct final_bias_reweight_args {
-        std::string cvfile_path;
-        std::string metadgrid_path;
+        bf::path cvfile_path;
+        bf::path metadgrid_path;
         std::string ranges_min_rawstr;
         std::string ranges_max_rawstr;
 

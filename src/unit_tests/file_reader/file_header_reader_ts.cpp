@@ -257,7 +257,33 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
     }
 
 
+    BOOST_AUTO_TEST_CASE(remove_nongrid_field_tc) {
+
+        const std::string filecontent = "#! FIELDS aaa bbb\n"
+                                        "#! SET min_aaa 4.90\n"
+                                        "#! SET max_aaa 8.90\n"
+                                        "#! SET nbins_aaa 10\n"
+                                        "#! SET periodic_aaa false\n"
+                                        "#! SET normalisation 2.20\n"
+                                        "# OtherHeaderField\n"
+                                        "0.112 0.12\n"
+                                        "-1.4 0.0e-3\n"
+                                        "inf 0.2\n"
+                                        "2 nan\n";
+
+        TempTextFile tempFile(filecontent);
+
+        f::PlumedDatHeader header = f::read_cv_file_header(tempFile.getName());
+
+        BOOST_TEST(header.fields.size() == 2);
+        BOOST_REQUIRE(header.fields.size() == 2);
+
+        remove_nongrid_fields(header);
 
 
+        BOOST_TEST(header.fields.size() == 1);
 
-    BOOST_AUTO_TEST_SUITE_END();
+    }
+
+
+BOOST_AUTO_TEST_SUITE_END();

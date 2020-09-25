@@ -76,18 +76,17 @@ set(PCH_SYST_HEADER_LIST
         <variant>
         <fmt/format.h>
         <boost/log/trivial.hpp>
+        <boost/filesystem.hpp>
         <Eigen/Dense>
         <stdexcept>
         <yaml-cpp/yaml.h>
         )
 
-set(SOURCE_LIST src/GeneralOptions.cpp
-                src/GeneralOptions.h
+set(SOURCE_LIST
+        src/GeneralOptions.h
                 src/final_bias_reweight/final_bias_reweight.hpp
                 src/final_bias_reweight/final_bias_reweight.cpp
                 src/frontend_common.h
-                src/help/help.hpp
-                src/help/help.cpp
                 src/common/extract_from_string.cpp
                 src/common/extract_from_string.hpp
                 src/file_reader/PlumedDatHeader.cpp
@@ -104,13 +103,72 @@ set(SOURCE_LIST src/GeneralOptions.cpp
                 src/common/dummy_sink_node.hpp
                 src/grid/grid_utils.cpp
                 src/grid/grid_utils.hpp
-                src/grid/Grid.cpp
-                src/grid/Grid.hpp src/common/limiter_decrementer_node.hpp src/grid/grid_filler_node.cpp src/grid/grid_filler_node.hpp src/progress/progress_printer.cpp src/progress/progress_printer.hpp src/progress/progress_printer_nodes.hpp src/reconstruct_from_fragments/reconstruct_from_fragments.cpp src/reconstruct_from_fragments/reconstruct_from_fragments.hpp src/grid/ingest_grid.cpp src/grid/ingest_grid.hpp src/file_reader/field_function_heuristics.cpp src/file_reader/field_function_heuristics.hpp src/fragment_info/parse_fragment_info_yaml.cpp src/fragment_info/parse_fragment_info_yaml.hpp src/fragment_info/FragmentInfo.cpp src/fragment_info/FragmentInfo.hpp src/fragment_info/FragmentInfo_Utils.cpp src/fragment_info/FragmentInfo_Utils.hpp src/reconstruct_from_fragments/reconstruction_verynaive.cpp src/reconstruct_from_fragments/reconstruction_verynaive.hpp src/reconstruct_from_fragments/reconstruction_utils.cpp src/reconstruct_from_fragments/reconstruction_utils.hpp src/log_utils.hpp src/export/simple_opendx.cpp src/export/simple_opendx.hpp)
+        src/common/limiter_decrementer_node.hpp
+        src/file_reader/grid_file/grid_filler_node.cpp
+        src/file_reader/grid_file/grid_filler_node.hpp
+                src/progress/progress_printer.cpp
+                src/progress/progress_printer.hpp
+                src/progress/progress_printer_nodes.hpp
+                src/reconstruct_from_fragments/reconstruct_from_fragments.cpp
+                src/reconstruct_from_fragments/reconstruct_from_fragments.hpp
+        src/file_reader/field_function_heuristics.cpp
+                src/file_reader/field_function_heuristics.hpp
+                src/fragment_info/parse_fragment_info_yaml.cpp
+                src/fragment_info/parse_fragment_info_yaml.hpp
+                src/fragment_info/FragmentInfo.cpp
+                src/fragment_info/FragmentInfo.hpp
+                src/fragment_info/FragmentInfo_Utils.cpp
+                src/fragment_info/FragmentInfo_Utils.hpp
+                src/reconstruct_from_fragments/reconstruction_verynaive.cpp
+                src/reconstruct_from_fragments/reconstruction_verynaive.hpp
+                src/reconstruct_from_fragments/reconstruction_utils.cpp
+                src/reconstruct_from_fragments/reconstruction_utils.hpp
+                src/log_utils.hpp src/export/simple_opendx.cpp
+                src/export/simple_opendx.hpp
+                src/runfile/yaml_frontend.hpp
+                src/runfile/yaml_frontend.cpp
+                src/runfile/runfile_general_section.cpp
+                src/runfile/runfile_general_section.hpp
+                src/GeneralOptions.cpp
+                src/runfile/runfile_search_directory_section.cpp
+                src/runfile/runfile_search_directory_section.hpp
+                src/runfile/runfile_steps.cpp
+                src/runfile/runfile_steps.hpp
+                src/runfile/runfile_fes_data.cpp
+                src/runfile/runfile_fes_data.hpp
+                src/runfile/runfile_parsed_tree.cpp
+                src/runfile/runfile_parsed_tree.hpp
+                src/runfile/runfile_reweight.cpp
+                src/runfile/runfile_reweight.hpp
+                src/common/find_in_search_directory.cpp
+                src/common/find_in_search_directory.hpp
+                src/common/yaml_utils.cpp
+                src/common/yaml_utils.hpp
+                src/runfile/runfile_steps_executor.cpp
+                src/runfile/runfile_steps_executor.hpp
+        src/steps/step_fes_data.cpp
+        src/steps/step_fes_data.hpp
+        src/frontend_common.cpp
+        src/file_reader/cv_file/CVData.cpp
+        src/file_reader/cv_file/CVData.hpp
+        src/file_reader/cv_file/ingest_cv_data.cpp
+        src/file_reader/cv_file/ingest_cv_data.hpp
+        src/export/array_bindump.cpp
+        src/export/array_bindump.hpp
+        src/file_reader/cv_file/CVData_filler_node.cpp
+        src/file_reader/cv_file/CVData_filler_node.hpp
+        src/file_reader/hills_file/HillsData.cpp
+        src/file_reader/hills_file/HillsData.hpp
+        src/file_reader/grid_file/GridData.cpp
+        src/file_reader/grid_file/GridData.hpp
+        src/file_reader/grid_file/ingest_grid_data.cpp
+        src/file_reader/grid_file/ingest_grid_data.hpp
+        src/common/NotImplementedError.cpp src/common/NotImplementedError.hpp)
 
 set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt yaml-cpp)
 
 
-add_executable(fesutils src/cli_frontend.cpp ${SOURCE_LIST})
+add_executable(fesutils src/entrypoint.cpp ${SOURCE_LIST})
 target_compile_definitions(fesutils PUBLIC BOOST_LOG_DYN_LINK)
 
 target_link_libraries(fesutils  ${LIBRARY_LINK_LIST})
@@ -147,7 +205,29 @@ set(TEST_SOURCE_LIST
         src/unit_tests/file_reader/read_file_ts.cpp
         src/unit_tests/TempTextFile.hpp
         src/unit_tests/TempTextFile.cpp
-        src/unit_tests/file_reader/parse_space_separated_values_ts.cpp src/unit_tests/grid/grid_utils_ts.cpp src/unit_tests/grid/grid_ts.cpp src/unit_tests/MiscFixture.cpp src/unit_tests/MiscFixture.hpp src/grid/NDArray.cpp src/grid/NDArray.hpp src/unit_tests/grid/ndarray_ts.cpp src/unit_tests/common/misc_ts.cpp src/unit_tests/grid/grid_filler_node_ts.cpp src/unit_tests/progress/progress_printer_ts.cpp src/unit_tests/file_reader/field_function_heuristics_ts.cpp src/unit_tests/grid/ingest_grid_ts.cpp)
+        src/unit_tests/file_reader/parse_space_separated_values_ts.cpp
+        src/unit_tests/grid/grid_utils_ts.cpp
+        src/unit_tests/grid/grid_ts.cpp
+        src/unit_tests/MiscFixture.cpp
+        src/unit_tests/MiscFixture.hpp
+        src/unit_tests/common/misc_ts.cpp
+        src/unit_tests/grid/grid_filler_node_ts.cpp
+        src/unit_tests/progress/progress_printer_ts.cpp
+        src/unit_tests/file_reader/field_function_heuristics_ts.cpp
+        src/unit_tests/grid/ingest_grid_ts.cpp
+        src/unit_tests/TempDirectory.cpp
+        src/unit_tests/TempDirectory.hpp
+        src/unit_tests/common/find_in_search_directory_ts.cpp
+        src/unit_tests/dummy_template_ts.cpp
+        src/unit_tests/common/limiter_decrementer_node_ts.cpp
+        src/unit_tests/common/yaml_utils_ts.cpp
+        src/unit_tests/frontend_common_ts.cpp
+        src/unit_tests/general_option_ts.cpp
+        src/unit_tests/export/array_bindump_ts.cpp
+        src/unit_tests/file_reader/cv_file/CVData_ts.cpp
+        src/unit_tests/file_reader/cv_file/CVData_filler_node_ts.cpp
+        src/unit_tests/file_reader/cv_file/ingest_cv_data_ts.cpp
+        src/unit_tests/file_reader/grid_file/GridData_ts.cpp src/unit_tests/progress/progress_printer_node_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})

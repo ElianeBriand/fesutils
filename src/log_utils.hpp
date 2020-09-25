@@ -10,6 +10,9 @@
 
 namespace std {
 
+    // LCOV_EXCL_START
+    // Reason for coverage exclusion: gcov/lcov does not process template class properly
+
     template<typename T, typename TT>
     inline basic_ostream<TT>& operator<<(basic_ostream<TT>& p, const std::vector<T>& vector) {
         p << "[ ";
@@ -30,6 +33,8 @@ namespace std {
         p << "]";
         return p;
     }
+
+    // LCOV_EXCL_STOP
 
 }
 

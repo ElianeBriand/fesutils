@@ -26,43 +26,61 @@
 
 namespace fesutils {
 
-    // LCOV_EXCL_START
-    // Reason for coverage exclusion: FIXME: Not counted correctly with LCOV/GCOV ?? Do not know why
-    template<typename workPacketType>
-    class progress_work_packet_registerer {
+
+
+    class PerLine_TodoToInflight_node {
     public:
-        explicit progress_work_packet_registerer(Progress_printer& progress_printer_) :
+        explicit PerLine_TodoToInflight_node(ProgressPrinter& progress_printer_) :
                 progress_printer(progress_printer_){
 
         };
 
-        inline workPacketType  operator()(workPacketType workPacket) {
-            this->progress_printer.increment_workpacket_total_count();
+        inline std::shared_ptr<std::vector<std::string>>  operator()(std::shared_ptr<std::vector<std::string>> workPacket) {
+            unsigned int num_line = workPacket->size();
+            this->progress_printer.add_to_inflight_count(num_line);
+            this->progress_printer.substract_from_todo_count(num_line);
             return workPacket;
         }
 
     private:
-        Progress_printer& progress_printer;
+        ProgressPrinter& progress_printer;
     };
 
-    template<typename workPacketType>
-    class progress_work_packet_done_reporter {
+    class PerContMsg_InflightToDone_node {
     public:
-        explicit progress_work_packet_done_reporter(Progress_printer& progress_printer_) :
+        explicit PerContMsg_InflightToDone_node(ProgressPrinter& progress_printer_) :
                 progress_printer(progress_printer_){
 
         };
 
-        inline workPacketType  operator()(workPacketType workPacket) {
-            this->progress_printer.increment_workpacket_done_count();
+        inline tbb::flow::continue_msg  operator()(tbb::flow::continue_msg workPacket) {
+            this->progress_printer.increment_done_count();
+            this->progress_printer.decrement_inflight_count();
             return workPacket;
         }
 
     private:
-        Progress_printer& progress_printer;
+        ProgressPrinter& progress_printer;
     };
 
-    // LCOV_EXCL_STOP
+    class PerNumItem_InflightToDone_node {
+    public:
+        explicit PerNumItem_InflightToDone_node(ProgressPrinter& progress_printer_) :
+                progress_printer(progress_printer_){
+
+        };
+
+        inline tbb::flow::continue_msg  operator()(unsigned int num_processed_item) {
+            this->progress_printer.add_to_done_count(num_processed_item);
+            this->progress_printer.substract_from_inflight_count(num_processed_item);
+            return tbb::flow::continue_msg();
+        }
+
+    private:
+        ProgressPrinter& progress_printer;
+    };
+
+
 
 }
 

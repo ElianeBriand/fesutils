@@ -18,4 +18,74 @@
  *
  */
 
+
 #include "GeneralOptions.h"
+
+#include <boost/algorithm/string.hpp>
+
+#include <boost/log/trivial.hpp>
+
+
+namespace fesutils {
+
+    LogLevel string_to_LogLevel(const std::string& loglevel_as_str) {
+        const std::string loglevel_str_lower = boost::algorithm::to_lower_copy(loglevel_as_str);
+
+        if(loglevel_str_lower == "debug") {
+            return LogLevel::debug;
+        }else if (loglevel_str_lower == "info") {
+            return LogLevel::info;
+        }else if (loglevel_str_lower == "warning") {
+            return LogLevel::warning;
+        }else if (loglevel_str_lower == "error") {
+            return LogLevel::error;
+        }else {
+            BOOST_LOG_TRIVIAL(warning) << "Unknown LogLevel \""<< loglevel_as_str << "\", selected debug level instead.";
+            return LogLevel::debug;
+        }
+    }
+
+    std::string logLevel_to_string(const LogLevel& loglevel) {
+        if(loglevel == LogLevel::debug) {
+            return "debug";
+        } else if(loglevel == LogLevel::info) {
+            return "info";
+        } else if(loglevel == LogLevel::warning) {
+            return "warning";
+        } else if(loglevel == LogLevel::error) {
+            return "error";
+        } else {
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: enum class incorrect value are difficult to cleanly produce for unit testing
+            return "<unknown loglevel enum>";
+            // LCOV_EXCL_STOP
+        }
+    }
+
+    BinaryCachePolicy string_to_BinaryCachePolicy(const std::string& binaryCachePolicy_as_str) {
+        const std::string bcp_str_lower = boost::algorithm::to_lower_copy(binaryCachePolicy_as_str);
+
+        if(bcp_str_lower == "always") {
+            return BinaryCachePolicy::always;
+        } else if(bcp_str_lower == "never") {
+            return BinaryCachePolicy::never;
+        }else {
+            BOOST_LOG_TRIVIAL(warning) << "Unknown binary cache policy \""<< binaryCachePolicy_as_str <<
+                            "\", will never cache instead for this run.";
+            return BinaryCachePolicy::never;
+        }
+    }
+
+    std::string binaryCachePolicy_to_string(const BinaryCachePolicy& binaryCachePolicy) {
+        if(binaryCachePolicy == BinaryCachePolicy::never) {
+            return "never";
+        } else if(binaryCachePolicy == BinaryCachePolicy::always) {
+            return "always";
+        } else {
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: enum class incorrect value are difficult to cleanly produce for unit testing
+            return "<unknown binary cache enum>";
+            // LCOV_EXCL_STOP
+        }
+    }
+}

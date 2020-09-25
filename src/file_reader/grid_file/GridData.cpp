@@ -1,0 +1,214 @@
+/*
+ * Copyright (c) 2020 Eliane Briand
+ *
+ * This file is part of fesutils.
+ *
+ * fesutils is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fesutils is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with fesutils.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "GridData.hpp"
+
+#include <locale>
+#include <tuple>
+#include <fmt/format.h>
+#include <fmt/locale.h>
+
+#include <boost/log/trivial.hpp>
+
+namespace fesutils {
+    GridData::GridData(unsigned int num_axis,
+                       std::vector<unsigned int> bins_per_axis_,
+                       std::vector<double> min_bin_value_per_axis_,
+                       std::vector<double> max_bin_value_per_axis_,
+                       bool track_access_number_) :
+                       num_axis(num_axis),
+                       bins_per_axis(std::move(bins_per_axis_)),
+                       min_bin_value_per_axis(std::move(min_bin_value_per_axis_)),
+                       max_bin_value_per_axis(std::move(max_bin_value_per_axis_)){
+
+        if(this->bins_per_axis.size() != num_axis ||
+            this->min_bin_value_per_axis.size() != num_axis ||
+            this->max_bin_value_per_axis.size() != num_axis) {
+            BOOST_LOG_TRIVIAL(error) << "GridData constructor called with inconsistent number of axis";
+            BOOST_LOG_TRIVIAL(error) << "num_axis = " << num_axis
+            << " but vector sizes are: " << this->bins_per_axis.size() << ", "
+            << this->min_bin_value_per_axis.size() << ", "
+            << this->max_bin_value_per_axis.size() << ".";
+            throw std::runtime_error("GridData constructor error");
+        }
+
+        this->num_voxels = 1;
+        for(const unsigned int& num_bins: this->bins_per_axis) {
+            if(num_bins == 1) {
+                BOOST_LOG_TRIVIAL(error) << "GridData does not support axis with only one bin.";
+                throw std::runtime_error("Single-bin axis in GridData");
+            }
+            this->num_voxels *= num_bins;
+        }
+
+        for(unsigned int axis = 0; axis < num_axis; axis++) {
+            const double range_between_maxmin_bins_value =
+                    this->max_bin_value_per_axis[axis] - this->min_bin_value_per_axis[axis];
+            const double bin_width = range_between_maxmin_bins_value/(this->bins_per_axis[axis] - 1);
+            this->bin_width_per_axis.push_back(bin_width);
+            if(bin_width < 0.0001) {
+                BOOST_LOG_TRIVIAL(warning) << "Trying to construct a grid with a numerically very small bin width (" << bin_width << ")";
+                BOOST_LOG_TRIVIAL(warning) << "This may have unforeseen consequences!";
+                BOOST_LOG_TRIVIAL(warning) << "Axis " << axis << " of " <<  num_axis << " with bin width = "<< bin_width;
+                this->has_small_bin_width_ = true;
+            }
+            const double min_bin_edge = this->min_bin_value_per_axis[axis] - (bin_width/2);
+            this->bin_edges_per_axis.emplace_back(this->bins_per_axis[axis] + 1, 0.0);
+            this->bin_centers_per_axis.emplace_back(this->bins_per_axis[axis], 0.0);
+
+            // Start from lowest edge, increment by bin_width. N bins -> N+1 edges
+            for(unsigned int i = 0; i <= this->bins_per_axis[axis]; i++) {
+                this->bin_edges_per_axis[axis][i] = (min_bin_edge + i * bin_width);
+            }
+
+            // N bins, N centers
+            const double bin_centers_distance = range_between_maxmin_bins_value/(this->bins_per_axis[axis]);
+            for(unsigned int i = 0; i < this->bins_per_axis[axis]; i++) {
+                this->bin_centers_per_axis[axis][i] = (this->min_bin_value_per_axis[axis] + i * bin_centers_distance);
+            }
+
+            this->axis_range_minmax.emplace_back(bin_edges_per_axis[axis].front(),bin_edges_per_axis[axis].back());
+
+        }
+
+
+    }
+
+
+    const unsigned int& GridData::get_num_axis() {
+        return this->num_axis;
+    }
+
+    const unsigned int& GridData::get_num_voxels() {
+        return this->num_voxels;
+    }
+
+    const std::vector<unsigned int>& GridData::get_bins_per_axis() {
+        return this->bins_per_axis;
+    }
+
+    const std::vector<double>& GridData::get_min_bin_value_per_axis() {
+        return this->min_bin_value_per_axis;
+    }
+
+    const std::vector<double>& GridData::get_max_bin_value_per_axis() {
+        return this->max_bin_value_per_axis;
+    }
+
+    const std::vector<double>& GridData::get_bin_width_per_axis() {
+        return this->bin_width_per_axis;
+    }
+
+    const std::vector<std::vector<double>>& GridData::get_bin_edges_per_axis() {
+        return this->bin_edges_per_axis;
+    }
+
+    const std::vector<std::vector<double>>& GridData::get_bin_centers_per_axis() {
+        return this->bin_centers_per_axis;
+    }
+
+
+    InMemoryGridData::InMemoryGridData(unsigned int num_axis,
+                                       std::vector<unsigned int> bins_per_axis,
+                                       std::vector<double> min_bin_value_per_axis,
+                                       std::vector<double> max_bin_value_per_axis,
+                                       bool track_access_number)
+            : GridData(num_axis,
+                       std::move(bins_per_axis),
+                       std::move(min_bin_value_per_axis),
+                       std::move(max_bin_value_per_axis),
+                       track_access_number),
+                       grid_values(this->num_voxels, 0.0){
+        BOOST_LOG_TRIVIAL(info) << fmt::format(std::locale("en_US.UTF-8"),
+                                                "InMemoryGridData: Allocating  {:L} bytes for grid ({:L} voxels total)",
+                                                (this->num_voxels * sizeof(double)), this->num_voxels );
+        if(track_access_number) {
+            BOOST_LOG_TRIVIAL(info) << fmt::format(std::locale("en_US.UTF-8"),
+                                                   "InMemoryGridData: Access tracking enabled: creating an auxiliary grid of size {:L} bytes",(this->num_voxels * sizeof(int)));
+            access_tracker_grid.insert(access_tracker_grid.begin(), this->num_voxels, 0);
+        }
+
+    }
+
+    bool GridData::coord_to_indices_rangechecked(const std::vector<double>& coord, std::vector<long int>& idx_buffer)  {
+        for(unsigned int axis = 0; axis < this->num_axis; axis++) {
+            const auto [range_min, range_max] = this->axis_range_minmax[axis];
+            if(coord[axis] < range_min || coord[axis] > range_max) {
+                return false;
+            }
+            const double abs_coord = coord[axis] - range_min;
+            const double continuous_bin_index =  abs_coord / bin_width_per_axis[axis];
+            const long int bin_index = std::floor(abs_coord);
+            idx_buffer[axis] = bin_index;
+        }
+        return true;
+    }
+
+    long int GridData::indices_to_globalindex(const std::vector<double>& coord) {
+        long int global_index = 0;
+        for(unsigned int axis = 0; axis < this->num_axis; axis++) {
+            // RESUME WORK HERE
+            global_index += axis * this->bins_per_axis[axis];
+        }
+        return 0;
+    }
+
+    const bool& GridData::has_small_bin_width() {
+        return this->has_small_bin_width_;
+    }
+
+    bool InMemoryGridData::insert_at_coord_rangechecked(const std::vector<double>& coord,
+                                                        double value,
+                                                        std::vector<long>& idx_buffer) {
+        const bool in_range = this->coord_to_indices_rangechecked(coord, idx_buffer);
+        if(!in_range) {
+            return false;
+        }
+        return true;
+
+    }
+
+    std::shared_ptr<GridData> GridData_factory(GridData_storage_class grid_storage_class,
+                                               unsigned int num_axis,
+                                             std::vector<unsigned int> bins_per_axis,
+                                             std::vector<double> min_bin_value_per_axis,
+                                             std::vector<double> max_bin_value_per_axis,
+                                             bool track_access_number) {
+        std::shared_ptr<GridData> new_griddata_object;
+
+        if(grid_storage_class == fesutils::GridData_storage_class::inmemory) {
+            new_griddata_object = std::make_shared<InMemoryGridData>(num_axis,
+                                                                     std::move(bins_per_axis),
+                                                                     std::move(min_bin_value_per_axis),
+                                                                     std::move(max_bin_value_per_axis),
+                                                                     track_access_number);
+        } else {
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: Difficult to generate incorrect values for enum class
+            BOOST_LOG_TRIVIAL(error) << "Unknown GRID storage class enum value";
+            throw std::runtime_error("Unknown GRID storage class");
+            // LCOV_EXCL_STOP
+        }
+
+        return new_griddata_object;
+    }
+}
+
+

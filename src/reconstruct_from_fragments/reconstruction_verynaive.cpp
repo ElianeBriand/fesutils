@@ -31,7 +31,7 @@
 // TODO: clean up the duplication in this file
 
 namespace fesutils {
-
+/*
     std::shared_ptr<Grid> reconstruction_verynaive_algorithm(const std::vector<std::shared_ptr<Grid>>& fes_grids,
                                                              const std::vector<PlumedDatHeader>& fes_grid_headers,
                                                              const FragmentInfo& fragmentInfo) {
@@ -355,5 +355,5 @@ namespace fesutils {
 
 
     }
-
+*/
 }

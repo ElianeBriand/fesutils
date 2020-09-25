@@ -1,0 +1,23 @@
+RESTART
+
+fragment_position: READ FILE=CV_fragment_benzene_head  VALUES=fragment_position.x,fragment_position.y,fragment_position.z IGNORE_FORCES
+
+metad_position: METAD ...
+  ARG=fragment_position.x,fragment_position.y,fragment_position.z
+  PACE=10000000 HEIGHT=0.0
+  BIASFACTOR=2
+  TEMP=300
+  SIGMA=0.10,0.10,0.10
+  FILE=HILLS_fragment_benzene
+  GRID_MIN=0.88,3.09,-1.86
+  GRID_MAX=10.06,14.22,9.70
+  GRID_SPACING=0.05,0.05,0.05
+  GRID_WFILE=GRID_benzene
+  GRID_WSTRIDE=1
+...
+
+
+
+
+
+

@@ -34,10 +34,9 @@
 #include "../common/print_lines_node.hpp"
 #include "../common/dummy_sink_node.hpp"
 #include "../file_reader/parse_space_separated_values_node.hpp"
-#include "../grid/Grid.hpp"
 #include "../grid/grid_utils.hpp"
 #include "../common/limiter_decrementer_node.hpp"
-#include "../grid/grid_filler_node.hpp"
+#include "../file_reader/grid_file/grid_filler_node.hpp"
 #include "../progress/progress_printer.hpp"
 #include "../progress/progress_printer_nodes.hpp"
 #include "../file_reader/field_function_heuristics.hpp"
@@ -48,7 +47,7 @@ namespace fesutils {
     // LCOV_EXCL_START
     // Reason for coverage exclusion: subject to system testing, not unit testing
     // System test script: st_final_bias_reweight.py
-
+/*
     int do_final_bias_reweight(GeneralOptions& options,
                                 const final_bias_reweight_args& args) {
 
@@ -56,7 +55,7 @@ namespace fesutils {
         std::vector<float> range_max = extract_range_from_string(args.ranges_max_rawstr);
 
         // ///// First read the bias grid file
-        PlumedDatHeader header_grid =  read_cv_file_header(args.metadgrid_path);
+        PlumedDatHeader header_grid =  read_cv_file_header(args.metadgrid_path.generic_string()); // FIXME: change to accept bf::path
 
         BOOST_LOG_TRIVIAL(info) << "Bias grid file: " << args.metadgrid_path;
 
@@ -82,7 +81,7 @@ namespace fesutils {
         BOOST_LOG_TRIVIAL(info) << "Grid has " << metad_grid->num_dims << " dimensions.";
 
 
-        std::string binarydump_path = args.metadgrid_path + ".bindump";
+        std::string binarydump_path = args.metadgrid_path.generic_string() + ".bindump";
         BOOST_LOG_TRIVIAL(info) << "Checking for previously-generated binary dump file: " << binarydump_path;
         bool did_load = metad_grid->load_binrepr_from_file(binarydump_path);
         if(did_load) {
@@ -96,7 +95,7 @@ namespace fesutils {
 
             tbb::flow::source_node<std::shared_ptr<std::vector<std::string>>> read_file_grid(g_grid,
                                                                                              read_space_separated_file_source(
-                                                                                                     args.metadgrid_path,
+                                                                                                     args.metadgrid_path.generic_string(),
                                                                                                      options.fileIOPerfOptions.binaryFileReadBufferSize),
                                                                                              false);
 
@@ -164,7 +163,7 @@ namespace fesutils {
         // ///// Then read the CV file and do the histogram
 
 
-        PlumedDatHeader header_cv =  read_cv_file_header(args.cvfile_path);
+        PlumedDatHeader header_cv =  read_cv_file_header(args.cvfile_path.generic_string());
 
         BOOST_LOG_TRIVIAL(info) << "CV file: " << args.cvfile_path;
         BOOST_LOG_TRIVIAL(info) << "Header information:";
@@ -175,7 +174,7 @@ namespace fesutils {
         tbb::flow::graph g_cv;
 
         tbb::flow::source_node<std::shared_ptr<std::vector<std::string>>> read_file_cv(g_cv,
-                                          read_space_separated_file_source(args.cvfile_path,
+                                          read_space_separated_file_source(args.cvfile_path.generic_string(),
                                                   options.fileIOPerfOptions.binaryFileReadBufferSize ),
                                                   false);
 
@@ -192,7 +191,7 @@ namespace fesutils {
         return 0;
 
     }
-
+*/
     // LCOV_EXCL_STOP
 
 }
