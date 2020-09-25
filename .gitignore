@@ -16,3 +16,4 @@ bundled-deps/build-*
 .~lock*
 */.ipynb_checkpoints/
 
+examples/GRID_*

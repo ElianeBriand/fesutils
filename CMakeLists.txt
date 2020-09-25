@@ -227,7 +227,7 @@ set(TEST_SOURCE_LIST
         src/unit_tests/file_reader/cv_file/CVData_ts.cpp
         src/unit_tests/file_reader/cv_file/CVData_filler_node_ts.cpp
         src/unit_tests/file_reader/cv_file/ingest_cv_data_ts.cpp
-        src/unit_tests/file_reader/grid_file/GridData_ts.cpp src/unit_tests/progress/progress_printer_node_ts.cpp)
+        src/unit_tests/file_reader/grid_file/GridData_ts.cpp src/unit_tests/progress/progress_printer_node_ts.cpp src/unit_tests/file_reader/grid_file/grid_filler_node_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})

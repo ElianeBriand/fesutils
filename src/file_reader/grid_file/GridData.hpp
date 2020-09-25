@@ -51,15 +51,16 @@ namespace fesutils {
 
         virtual const std::vector<std::vector<double>>& get_bin_centers_per_axis();
 
-        bool coord_to_indices_rangechecked(const std::vector<double>& coord, std::vector<long int>& idx_buffer);
+        virtual const bool& has_small_bin_width();
 
-        long int indices_to_globalindex(const std::vector<double>& coord);
+        bool coord_to_indices_rangechecked(const std::vector<double>& coord, std::vector<long int>& idx_buffer);
 
         virtual bool insert_at_coord_rangechecked(const std::vector<double>& coord, double value, std::vector<long int>& idx_buffer) = 0;
 
-        virtual const bool& has_small_bin_width();
+        virtual bool get_value_at_coord_rangechecked(const std::vector<double>& coord, double& value, std::vector<long int>& idx_buffer) = 0;
 
     protected:
+        long int indices_to_globalindex(const std::vector<long int>& indices);
 
         unsigned int num_axis;
         unsigned int num_voxels;
@@ -87,6 +88,8 @@ namespace fesutils {
         ~InMemoryGridData() = default;
 
         bool insert_at_coord_rangechecked(const std::vector<double>& coord, double value, std::vector<long int>& coord_buffer) final;
+
+        bool get_value_at_coord_rangechecked(const std::vector<double>& coord, double& value, std::vector<long int>& idx_buffer) final;
 
     protected:
         std::vector<double> grid_values;

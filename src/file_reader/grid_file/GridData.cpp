@@ -79,7 +79,7 @@ namespace fesutils {
             }
 
             // N bins, N centers
-            const double bin_centers_distance = range_between_maxmin_bins_value/(this->bins_per_axis[axis]);
+            const double bin_centers_distance = bin_width;
             for(unsigned int i = 0; i < this->bins_per_axis[axis]; i++) {
                 this->bin_centers_per_axis[axis][i] = (this->min_bin_value_per_axis[axis] + i * bin_centers_distance);
             }
@@ -155,19 +155,24 @@ namespace fesutils {
             }
             const double abs_coord = coord[axis] - range_min;
             const double continuous_bin_index =  abs_coord / bin_width_per_axis[axis];
-            const long int bin_index = std::floor(abs_coord);
+            const long int bin_index = std::floor(continuous_bin_index);
             idx_buffer[axis] = bin_index;
         }
         return true;
     }
 
-    long int GridData::indices_to_globalindex(const std::vector<double>& coord) {
+    long int GridData::indices_to_globalindex(const std::vector<long int>& indices) {
         long int global_index = 0;
         for(unsigned int axis = 0; axis < this->num_axis; axis++) {
-            // RESUME WORK HERE
-            global_index += axis * this->bins_per_axis[axis];
+            long int coefficient = 1;
+            if(axis > 0) {
+                for(unsigned int i = 0; i <= (axis - 1); i++) {
+                    coefficient *= this->bins_per_axis[i];
+                }
+            }
+            global_index += coefficient * indices[axis];
         }
-        return 0;
+        return global_index;
     }
 
     const bool& GridData::has_small_bin_width() {
@@ -176,13 +181,25 @@ namespace fesutils {
 
     bool InMemoryGridData::insert_at_coord_rangechecked(const std::vector<double>& coord,
                                                         double value,
-                                                        std::vector<long>& idx_buffer) {
+                                                        std::vector<long int>& idx_buffer) {
         const bool in_range = this->coord_to_indices_rangechecked(coord, idx_buffer);
         if(!in_range) {
             return false;
         }
+        const long int global_index = this->indices_to_globalindex(idx_buffer);
+        this->grid_values.at(global_index) = value;
         return true;
+    }
 
+    bool InMemoryGridData::get_value_at_coord_rangechecked(const std::vector<double>& coord, double& value,
+                                                           std::vector<long>& idx_buffer) {
+        const bool in_range = this->coord_to_indices_rangechecked(coord, idx_buffer);
+        if(!in_range) {
+            return false;
+        }
+        const long int global_index = this->indices_to_globalindex(idx_buffer);
+        value = this->grid_values.at(global_index);
+        return true;
     }
 
     std::shared_ptr<GridData> GridData_factory(GridData_storage_class grid_storage_class,
