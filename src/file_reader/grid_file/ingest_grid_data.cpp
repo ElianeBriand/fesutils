@@ -35,6 +35,7 @@ namespace bf = boost::filesystem;
 #include "grid_filler_node.hpp"
 #include "../../progress/progress_printer.hpp"
 #include "../../progress/progress_printer_nodes.hpp"
+#include "../../common/NotImplementedError.hpp"
 
 
 namespace fesutils {
@@ -86,10 +87,12 @@ namespace fesutils {
                                                  value_index,
                                                  variable_index,
                                                  has_valid_bindump.value());
-
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: defensive check, but will throw if error so unreachable
             if(!retvalue) {
                 return nullptr;
             }
+            // LCOV_EXCL_STOP
 
         } else {
             BOOST_LOG_TRIVIAL(info) << "Loading from text file...";
@@ -103,7 +106,10 @@ namespace fesutils {
                                                       variable_index);
 
             if(!retvalue) {
+                // LCOV_EXCL_START
+                // Reason for coverage exclusion: defensive check, but will throw if error so unreachable
                 return nullptr;
+                // LCOV_EXCL_STOP
             }
 
         }
@@ -123,7 +129,7 @@ namespace fesutils {
                                        const std::vector<size_t>& variable_index,
                                        const bf::path& bindump_path) {
         BOOST_LOG_TRIVIAL(debug) << "[NOTIMPLEMENTED] ingest_cv_data_from_bindump is not implemented";
-        throw std::runtime_error("Not implemented");
+        throw not_implemented_error("Not implemented");
         return false;
     }
 

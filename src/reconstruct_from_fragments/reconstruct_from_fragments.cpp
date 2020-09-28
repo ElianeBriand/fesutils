@@ -57,7 +57,7 @@ namespace fesutils {
 
         for (auto& fragment : fragmentInfo.fragments) {
             const std::string fes_path = fragment.path;
-            PlumedDatHeader header_grid = read_cv_file_header(fes_path);
+            PlumedDatHeader header_grid = read_plumed_file_header(fes_path);
             std::shared_ptr<Grid> p = ingest_fes_grid(options, fes_path, header_grid, args.fefield);
             fes_grid_headers.push_back(header_grid);
             fes_grids.push_back(p);

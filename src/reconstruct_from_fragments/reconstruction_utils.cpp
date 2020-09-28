@@ -24,7 +24,7 @@
 #include <boost/log/trivial.hpp>
 
 namespace fesutils {
-
+/*
     PlumedDatHeader grid_from_intersection_of_grids(const FragmentInfo& fragmentInfo, const std::vector<PlumedDatHeader>& headers) {
 
         std::vector<PlumedDatHeader> headers_rw = headers;
@@ -107,4 +107,5 @@ namespace fesutils {
         return true;
     }
 
+ */
 }

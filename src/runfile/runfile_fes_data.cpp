@@ -108,12 +108,6 @@ namespace fesutils {
             const YAML::Node& metad_bias_varname_node = fes_data_item_node["metad_bias_varname"];
 
             curr_item.metad_bias_varname = metad_bias_varname_node.as<std::string>();
-            if(curr_item.metad_bias_varname == "") {
-                BOOST_LOG_TRIVIAL(error) << "In fes_data section, for item: "  << item_shorthand;
-                BOOST_LOG_TRIVIAL(error) << "Property metad_bias_varname expect a single value - the name of the metadynamic bias variable (error code 00102)";
-                BOOST_LOG_TRIVIAL(error) << "An empty value (\"\") was encountered";
-                throw std::runtime_error("Empty metad_bias_varname");
-            }
 
             const YAML::Node& cv_varnames_node = fes_data_item_node["cv_varnames"];
             curr_item.cv_varnames = string_vector_from_yaml_sequence_node(cv_varnames_node);

@@ -22,13 +22,13 @@
 #define FESUTILS_RECONSTRUCTION_UTILS_HPP
 
 #include "../file_reader/PlumedDatHeader.hpp"
-#include "../fragment_info/FragmentInfo.hpp"
 
 namespace fesutils {
+    /*
     PlumedDatHeader grid_from_intersection_of_grids(const FragmentInfo& fragmentInfo, const std::vector<PlumedDatHeader>& headers);
 
     bool all_header_have_same_fields(const std::vector<PlumedDatHeader>& headers);
-
+*/
 
 
 }

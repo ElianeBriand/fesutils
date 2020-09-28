@@ -27,6 +27,7 @@
 #include "../../../file_reader/cv_file/ingest_cv_data.hpp"
 #include "../../TempDirectory.hpp"
 #include "../../../file_reader/read_file_header.hpp"
+#include "../../../common/NotImplementedError.hpp"
 
 
 namespace f = fesutils;
@@ -66,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(ingest_cv_data_ts)
                                                                   1,
                                                                   10);
 
-        f::PlumedDatHeader header = f::read_cv_file_header(temp_file->getName());
+        f::PlumedDatHeader header = f::read_plumed_file_header(temp_file->getName());
         std::vector<std::string> cv_varnames = {"fragment_position.x", "fragment_position.y", "fragment_position.z"};
         std::vector<size_t> cv_vars_idx = {1,2,3};
         std::string metad_bias_varname = "metad_position.bias";
@@ -85,7 +86,7 @@ BOOST_AUTO_TEST_SUITE(ingest_cv_data_ts)
                                                metad_bias_var_idx,
                                                other_var_idx,
                                                bindump_path),
-                          std::runtime_error);
+                          not_implemented_error);
 
         BOOST_CHECK_THROW(ingest_cv_data(options,
                                                       cv_file_path,
@@ -94,7 +95,7 @@ BOOST_AUTO_TEST_SUITE(ingest_cv_data_ts)
                                                       cv_varnames,
                                                       metad_bias_varname,
                                                       other_varnames),
-                          std::runtime_error);
+                          not_implemented_error);
 
     }
 
@@ -115,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(ingest_cv_data_ts)
                                                                   3,
                                                                   10);
 
-        f::PlumedDatHeader header = f::read_cv_file_header(temp_file->getName());
+        f::PlumedDatHeader header = f::read_plumed_file_header(temp_file->getName());
         std::vector<std::string> cv_varnames = {"fragment_position.x", "fragment_position.y", "fragment_position.z"};
         std::vector<size_t> cv_vars_idx = {1,2,3};
         std::string metad_bias_varname = "metad_position.bias";

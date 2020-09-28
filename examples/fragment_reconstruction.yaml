@@ -75,7 +75,7 @@ reconstruction:
     mph_multiconformer:
         name: "Methylphenidate (multiple conformer reconstruction)"
         fragments: [meac, bzn, pip]
-        method: one_conformer
+        method: multiple_conformers
         geometry:
             meac:
                 - [ 0.340,  1.249, -0.757]

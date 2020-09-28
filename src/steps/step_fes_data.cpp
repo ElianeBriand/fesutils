@@ -41,7 +41,7 @@ namespace fesutils {
         const unsigned int num_value_dimensions = 1 +  fes_data_runfile.wall_bias_varnames.size();
 
         BOOST_LOG_TRIVIAL(info) << "Reading header from " << cv_file_path_str;
-        PlumedDatHeader cv_header =  read_cv_file_header(cv_file_path_str);
+        PlumedDatHeader cv_header = read_plumed_file_header(cv_file_path_str);
 
         std::shared_ptr<CVData> cv_data = CVData_factory(CVData_storage_class::inmemory,
                                                          num_cv_dimensions,
@@ -71,7 +71,8 @@ namespace fesutils {
             const std::string grid_file_path_str = fes_data_runfile.grid_file_path.value().generic_string();
             BOOST_LOG_TRIVIAL(info) << "Preparing to read GRID data from " << grid_file_path_str;
 
-            PlumedDatHeader header_grid =  read_cv_file_header(fes_data_runfile.grid_file_path.value().generic_string());
+            PlumedDatHeader header_grid = read_plumed_file_header(
+                    fes_data_runfile.grid_file_path.value().generic_string());
 
 
             size_t metad_bias_var_index = header_grid.find_field_index_from_name(fes_data_runfile.metad_bias_varname);

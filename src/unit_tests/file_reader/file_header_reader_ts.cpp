@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
     BOOST_AUTO_TEST_CASE(read_cv_file_header_nonexistent_tc) {
 
-        BOOST_CHECK_THROW( f::read_cv_file_header("NONEXISTENT.file"), std::runtime_error );
+        BOOST_CHECK_THROW(f::read_plumed_file_header("NONEXISTENT.file"), std::runtime_error );
 
     }
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
         TempTextFile tempFile(filecontent);
 
-        f::PlumedDatHeader header = f::read_cv_file_header(tempFile.getName());
+        f::PlumedDatHeader header = f::read_plumed_file_header(tempFile.getName());
 
         BOOST_TEST(header.fields.size() == 2);
         BOOST_REQUIRE(header.fields.size() == 2);
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_SUITE(file_header_reader_ts)
 
         TempTextFile tempFile(filecontent);
 
-        f::PlumedDatHeader header = f::read_cv_file_header(tempFile.getName());
+        f::PlumedDatHeader header = f::read_plumed_file_header(tempFile.getName());
 
         BOOST_TEST(header.fields.size() == 2);
         BOOST_REQUIRE(header.fields.size() == 2);

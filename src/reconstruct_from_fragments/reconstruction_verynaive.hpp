@@ -23,7 +23,6 @@
 
 #include <memory>
 
-#include "../fragment_info/FragmentInfo.hpp"
 
 namespace fesutils {
 /*

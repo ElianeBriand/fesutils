@@ -46,6 +46,8 @@ namespace fesutils {
         long int last_done_count = this->done_count.load(std::memory_order_acquire);
         bool shouldPrint = true;
 
+        // LCOV_EXCL_START
+        // Reason for coverage exclusion: flaky testing due to threaded execution
         while(true) {
             if(! this->printer_thread_continue.load(std::memory_order_acquire)) {
                 break;
@@ -68,8 +70,7 @@ namespace fesutils {
             }
 
             if(shouldPrint) {
-                std::string progress_line = fmt::format(std::locale("en_US.UTF-8"),
-                                                       "{:s}Progress | todo: {:L} | inflight: {:L} | done: {:L}      ",
+                std::string progress_line = fmt::format("{:s}Progress | todo: {:d} | inflight: {:d} | done: {:d}      ",
                                                         this->space_prefix, local_todo_count, local_inflight_count, local_done_count );
 
                 std::cout << "\r" << progress_line;
@@ -78,6 +79,7 @@ namespace fesutils {
             }
 
         }
+        // LCOV_EXCL_STOP
     }
 
     void ProgressPrinter::finish() {
@@ -87,8 +89,8 @@ namespace fesutils {
         long int local_todo_count = this->todo_count.load(std::memory_order_acquire);
         long int local_inflight_count = this->inflight_count.load(std::memory_order_acquire);
         long int local_done_count = this->done_count.load(std::memory_order_acquire);
-        std::string progress_line = fmt::format(std::locale("en_US.UTF-8"),
-                                                "{:s}Progress | todo: {:L} | inflight: {:L} | done: {:L} | Finished      ",
+        std::string progress_line = fmt::format(
+                                                "{:s}Progress | todo: {:d} | inflight: {:d} | done: {:d} | Finished      ",
                                                 this->space_prefix, local_todo_count, local_inflight_count, local_done_count );
         std::cout << "\r" << progress_line;
         std::cout << std::endl;

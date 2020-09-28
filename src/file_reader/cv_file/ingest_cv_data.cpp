@@ -30,6 +30,7 @@
 #include "../../progress/progress_printer_nodes.hpp"
 #include "CVData_filler_node.hpp"
 #include "../../common/limiter_decrementer_node.hpp"
+#include "../../common/NotImplementedError.hpp"
 
 namespace fesutils {
 
@@ -103,7 +104,7 @@ namespace fesutils {
                                      const std::vector<size_t>& other_vars_idx,
                                      const bf::path& bindump_path) {
         BOOST_LOG_TRIVIAL(debug) << "[NOTIMPLEMENTED] ingest_cv_data_from_bindump is not implemented";
-        throw std::runtime_error("Not implemented");
+        throw not_implemented_error("ingest_cv_data_from_bindump not implemented");
         return false;
     }
 

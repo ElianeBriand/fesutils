@@ -137,7 +137,7 @@ namespace fesutils {
 
 
 
-    PlumedDatHeader read_cv_file_header(const std::string& path) {
+    PlumedDatHeader read_plumed_file_header(const std::string& path) {
         PlumedDatHeader header;
 
         if(!path_exists_isfile(path)) {

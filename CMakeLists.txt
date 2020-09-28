@@ -113,12 +113,6 @@ set(SOURCE_LIST
                 src/reconstruct_from_fragments/reconstruct_from_fragments.hpp
         src/file_reader/field_function_heuristics.cpp
                 src/file_reader/field_function_heuristics.hpp
-                src/fragment_info/parse_fragment_info_yaml.cpp
-                src/fragment_info/parse_fragment_info_yaml.hpp
-                src/fragment_info/FragmentInfo.cpp
-                src/fragment_info/FragmentInfo.hpp
-                src/fragment_info/FragmentInfo_Utils.cpp
-                src/fragment_info/FragmentInfo_Utils.hpp
                 src/reconstruct_from_fragments/reconstruction_verynaive.cpp
                 src/reconstruct_from_fragments/reconstruction_verynaive.hpp
                 src/reconstruct_from_fragments/reconstruction_utils.cpp
@@ -227,7 +221,11 @@ set(TEST_SOURCE_LIST
         src/unit_tests/file_reader/cv_file/CVData_ts.cpp
         src/unit_tests/file_reader/cv_file/CVData_filler_node_ts.cpp
         src/unit_tests/file_reader/cv_file/ingest_cv_data_ts.cpp
-        src/unit_tests/file_reader/grid_file/GridData_ts.cpp src/unit_tests/progress/progress_printer_node_ts.cpp src/unit_tests/file_reader/grid_file/grid_filler_node_ts.cpp)
+        src/unit_tests/file_reader/grid_file/GridData_ts.cpp
+        src/unit_tests/progress/progress_printer_node_ts.cpp
+        src/unit_tests/file_reader/grid_file/grid_filler_node_ts.cpp
+        src/unit_tests/file_reader/grid_file/ingest_grid_data_ts.cpp
+        src/unit_tests/common/not_implemented_error_ts.cpp src/unit_tests/runfile/runfile_fes_data_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})

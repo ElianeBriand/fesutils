@@ -32,7 +32,7 @@ namespace fesutils {
      * \param path Path to the CV file
      * \return filled PlumedDatHeader
      */
-    PlumedDatHeader read_cv_file_header(const std::string& path);
+    PlumedDatHeader read_plumed_file_header(const std::string& path);
 
     // //////////// Internals exposed for testing purposes  ////////////
 

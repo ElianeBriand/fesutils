@@ -44,8 +44,6 @@ fesutils::grid_filler_node::grid_filler_node(std::shared_ptr<GridData> grid_,
 unsigned int fesutils::grid_filler_node::operator()(
         std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> data) {
 
-    assert(data->cols() == this->grid->get_num_axis() + 1);
-
     for(size_t row_n = 0; row_n < data->rows(); row_n++) {
         //BOOST_LOG_TRIVIAL(debug) << "grid_filler_node::operator() row_n = " << row_n;
         for(size_t i = 0; i < this->grid->get_num_axis(); i++){

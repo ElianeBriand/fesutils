@@ -163,7 +163,7 @@ namespace fesutils {
         // ///// Then read the CV file and do the histogram
 
 
-        PlumedDatHeader header_cv =  read_cv_file_header(args.cvfile_path.generic_string());
+        PlumedDatHeader header_cv =  read_plumed_file_header(args.cvfile_path.generic_string());
 
         BOOST_LOG_TRIVIAL(info) << "CV file: " << args.cvfile_path;
         BOOST_LOG_TRIVIAL(info) << "Header information:";

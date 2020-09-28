@@ -18,14 +18,25 @@
  *
  */
 
-#ifndef FESUTILS_FRAGMENTINFO_UTILS_HPP
-#define FESUTILS_FRAGMENTINFO_UTILS_HPP
+#define BOOST_TEST_DYN_LINK
 
-#include "FragmentInfo.hpp"
+#include <vector>
+#include <iostream>
 
-namespace fesutils {
+#include <boost/test/unit_test.hpp>
+#include "../../common/NotImplementedError.hpp"
 
-    void fragment_path_from_filename(FragmentInfo& finfo, const std::vector<std::string>& fes_paths);
-}
 
-#endif //FESUTILS_FRAGMENTINFO_UTILS_HPP
+namespace f = fesutils;
+
+BOOST_AUTO_TEST_SUITE(not_implemented_error_ts)
+
+    BOOST_AUTO_TEST_CASE(ctor_tc, *boost::unit_test::tolerance(0.001)) {
+        not_implemented_error a("aaa");
+
+        BOOST_TEST(a.what() == "aaa");
+
+    }
+
+
+BOOST_AUTO_TEST_SUITE_END();
