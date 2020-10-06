@@ -71,14 +71,17 @@ namespace fesutils {
     }
 
     bool check_if_parameter_sets_exists(const StepFunction function, const std::string& param_set_str) {
-        if(function == fes_data) {
+        if(function == StepFunction::fes_data) {
             return g_runfileitem_fesdata_list.count(param_set_str);
-        } else if (function == reweight) {
+        } else if (function == StepFunction::reweight) {
             return g_runfileitem_reweight_list.count(param_set_str);
         } else {
-            BOOST_LOG_TRIVIAL(error) << "Unrecognized step function enum value: " << function;
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: Difficult to generate incorrect values for enum class
+            BOOST_LOG_TRIVIAL(error) << "Unrecognized step function enum value";
             BOOST_LOG_TRIVIAL(error) << "This is likely a bug, not an user error";
-            throw std::runtime_error("Unknwon step function");
+            throw std::runtime_error("Unknown step function");
+            // LCOV_EXCL_STOP
         }
     }
 

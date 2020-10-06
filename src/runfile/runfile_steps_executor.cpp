@@ -27,6 +27,8 @@
 
 namespace fesutils {
 
+    // LCOV_EXCL_START
+    // Reason for coverage exclusion: Would in essence be an integration test, not unit test
     void execute_steps(GeneralOptions& options) {
 
         const size_t num_steps = g_all_steps_list.size();
@@ -41,7 +43,7 @@ namespace fesutils {
 
                 setup_log_formating_increase_indentation();
 
-                if(current_step.function == fes_data) {
+                if(current_step.function == StepFunction::fes_data) {
                     run_fes_data_step(options, parameter_set_name);
                 } else {
                     BOOST_LOG_TRIVIAL(debug) << "[NOT IMPLEMENTED] step not implemented";
@@ -59,5 +61,6 @@ namespace fesutils {
 
         }
     }
+    // LCOV_EXCL_STOP
 
 }

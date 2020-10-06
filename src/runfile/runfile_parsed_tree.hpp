@@ -53,24 +53,25 @@ namespace fesutils {
 
 
    struct RunfileItem_Reweight {
-        enum WallReachedBehavior {
+        enum class WallReachedBehavior {
            discard
         };
 
-       enum ReweightMethod {
+       enum class ReweightMethod {
            // reweight_spline, // not implemented yet
            reweight_no_interp
        };
 
         WallReachedBehavior wall_reached_behavior;
         ReweightMethod reweight_method;
+        std::vector<std::string> data;
         std::vector<final_bias_reweight_args> args_v;
 
     };
 
     extern std::map<std::string, RunfileItem_Reweight> g_runfileitem_reweight_list;
 
-    enum StepFunction {
+    enum class StepFunction {
         fes_data,
         reweight,
         histogram,

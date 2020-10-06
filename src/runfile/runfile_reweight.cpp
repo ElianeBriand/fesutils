@@ -48,25 +48,27 @@ namespace fesutils {
             const YAML::Node& fes_data_item_node = node_it->second;
 
             if (!fes_data_item_node["method"]) {
-                if (!fes_data_item_node["method"].IsScalar() ) {
-                    BOOST_LOG_TRIVIAL(error) << "In fes_data section, for item: "  << item_shorthand;
-                    BOOST_LOG_TRIVIAL(error) << "The method attribute should be a scalar corresponding to the reweight method (error code 00103)";
-                    throw std::runtime_error("Runfile structure error");
-                }
                 BOOST_LOG_TRIVIAL(error) << "In reweight section, for item: "  << item_shorthand;
                 BOOST_LOG_TRIVIAL(error) << "Missing mandatory property: method (error code 00103)";
                 throw std::runtime_error("Missing mandatory YAML runfile section");
             }
 
+            if (!fes_data_item_node["method"].IsScalar() ) {
+                BOOST_LOG_TRIVIAL(error) << "In fes_data section, for item: "  << item_shorthand;
+                BOOST_LOG_TRIVIAL(error) << "The method attribute should be a scalar corresponding to the reweight method (error code 00103)";
+                throw std::runtime_error("Runfile structure error");
+            }
+
             if (!fes_data_item_node["wall_reached"]) {
-                if (!fes_data_item_node["wall_reached"].IsScalar() ) {
-                    BOOST_LOG_TRIVIAL(error) << "In fes_data section, for item: "  << item_shorthand;
-                    BOOST_LOG_TRIVIAL(error) << "The wall_reached attribute should be a scalar corresponding to the action to be taken (error code 00103)";
-                    throw std::runtime_error("Runfile structure error");
-                }
                 BOOST_LOG_TRIVIAL(error) << "In reweight section, for item: "  << item_shorthand;
                 BOOST_LOG_TRIVIAL(error) << "Missing mandatory property: wall_reached (error code 00103)";
                 throw std::runtime_error("Missing mandatory YAML runfile section");
+            }
+
+            if (!fes_data_item_node["wall_reached"].IsScalar() ) {
+                BOOST_LOG_TRIVIAL(error) << "In fes_data section, for item: "  << item_shorthand;
+                BOOST_LOG_TRIVIAL(error) << "The wall_reached attribute should be a scalar corresponding to the action to be taken (error code 00103)";
+                throw std::runtime_error("Runfile structure error");
             }
 
             if (!fes_data_item_node["data"]) {
@@ -84,18 +86,17 @@ namespace fesutils {
 
             RunfileItem_Reweight curr_item;
 
-            std::vector<std::string> fes_data_shorthands;
             if(fes_data_item_node["data"].IsScalar())
             {
-                fes_data_shorthands.push_back(fes_data_item_node["data"].as<std::string>());
+                curr_item.data.push_back(fes_data_item_node["data"].as<std::string>());
             }else {
                 const YAML::Node& fes_data_vector_node = fes_data_item_node["data"];
-                fes_data_shorthands = string_vector_from_yaml_sequence_node(fes_data_vector_node);
+                curr_item.data = string_vector_from_yaml_sequence_node(fes_data_vector_node);
             }
 
             const std::string method_str = fes_data_item_node["method"].as<std::string>();
             if(method_str == "reweight_no_interp") {
-                curr_item.reweight_method = RunfileItem_Reweight::reweight_no_interp;
+                curr_item.reweight_method = RunfileItem_Reweight::ReweightMethod::reweight_no_interp;
             } else {
                 BOOST_LOG_TRIVIAL(error) << "The specified reweighting method  is unknown (error code 00103)";
                 throw std::runtime_error("Unknown method attribute");
@@ -104,7 +105,7 @@ namespace fesutils {
 
             const std::string wall_reached_b_str = fes_data_item_node["wall_reached"].as<std::string>();
             if(wall_reached_b_str == "discard") {
-                curr_item.wall_reached_behavior = RunfileItem_Reweight::discard;
+                curr_item.wall_reached_behavior = RunfileItem_Reweight::WallReachedBehavior::discard;
             } else {
                 BOOST_LOG_TRIVIAL(error) << "The specified wall_reached behaviour is unknown (error code 00103)";
                 throw std::runtime_error("Unknown wall_reached behaviour");

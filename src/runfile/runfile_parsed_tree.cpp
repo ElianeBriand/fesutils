@@ -36,13 +36,13 @@ namespace fesutils {
 
     StepFunction string_to_stepfunction(const std::string& function_as_string) {
         if(function_as_string == "fes_data") {
-            return fes_data;
+            return StepFunction::fes_data;
         } else if (function_as_string == "reweight") {
-            return reweight;
+            return StepFunction::reweight;
         } else if (function_as_string == "histogram") {
-            return histogram;
+            return StepFunction::histogram;
         } else if (function_as_string == "reconstruction") {
-            return reconstruction;
+            return StepFunction::reconstruction;
         } else {
             BOOST_LOG_TRIVIAL(error) << "Unrecognized step function: " << function_as_string;
             throw std::runtime_error("Unknwon step function");
@@ -51,18 +51,21 @@ namespace fesutils {
     }
 
     std::string stepfunction_to_string(const StepFunction& stepFunction) {
-        if(stepFunction == fes_data) {
+        if(stepFunction == StepFunction::fes_data) {
             return "fes_data";
-        } else if (stepFunction == reweight) {
+        } else if (stepFunction == StepFunction::reweight) {
             return "reweight";
-        } else if (stepFunction == histogram) {
+        } else if (stepFunction == StepFunction::histogram) {
             return "histogram";
-        } else if (stepFunction == reconstruction) {
+        } else if (stepFunction == StepFunction::reconstruction) {
             return "reconstruction";
         } else {
-            BOOST_LOG_TRIVIAL(error) << "Unrecognized step function enum value: " << stepFunction;
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: Difficult to generate incorrect values for enum class
+            BOOST_LOG_TRIVIAL(error) << "Unrecognized step function enum value";
             BOOST_LOG_TRIVIAL(error) << "Likely a bug rather than a user error";
-            throw std::runtime_error("Unknwon step function enum value");
+            throw std::runtime_error("Unknown step function enum value");
+            // LCOV_EXCL_STOP
         }
     }
 

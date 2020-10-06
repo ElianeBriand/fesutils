@@ -36,6 +36,14 @@ BOOST_AUTO_TEST_SUITE(not_implemented_error_ts)
 
         BOOST_TEST(a.what() == "aaa");
 
+        not_implemented_error b(std::string("aaa"));
+
+        BOOST_TEST(b.what() == "aaa");
+
+        // Dtor explicit usage for coverage purpose
+        not_implemented_error* c = new not_implemented_error(std::string("aaa"));
+        delete c;
+
     }
 
 

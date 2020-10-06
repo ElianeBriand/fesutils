@@ -29,6 +29,9 @@
 
 namespace fesutils {
 
+    // LCOV_EXCL_START
+    // Reason for coverage exclusion: Would in essence be an integration test, not unit test
+
     bool run_fes_data_step(GeneralOptions options, const std::string& parameter_set_name) {
 
         RunfileItem_FESData fes_data_runfile = g_runfileitem_fesdata_list[parameter_set_name];
@@ -118,4 +121,6 @@ namespace fesutils {
 
         return true;
     }
+
+    // LCOV_EXCL_STOP
 }

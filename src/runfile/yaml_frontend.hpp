@@ -27,7 +27,7 @@
 
 
 namespace fesutils {
-    void read_yaml_runfile(GeneralOptions options,
+    void read_yaml_runfile(GeneralOptions& options,
                           const std::string& runfile_path);
 }
 

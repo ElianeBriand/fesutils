@@ -225,7 +225,7 @@ set(TEST_SOURCE_LIST
         src/unit_tests/progress/progress_printer_node_ts.cpp
         src/unit_tests/file_reader/grid_file/grid_filler_node_ts.cpp
         src/unit_tests/file_reader/grid_file/ingest_grid_data_ts.cpp
-        src/unit_tests/common/not_implemented_error_ts.cpp src/unit_tests/runfile/runfile_fes_data_ts.cpp)
+        src/unit_tests/common/not_implemented_error_ts.cpp src/unit_tests/runfile/runfile_fes_data_ts.cpp src/unit_tests/runfile/runfile_general_ts.cpp src/unit_tests/runfile/runfile_parsed_tree_ts.cpp src/unit_tests/runfile/runfile_reweight_ts.cpp src/unit_tests/runfile/runfile_search_directory_ts.cpp src/unit_tests/runfile/runfile_steps_ts.cpp src/unit_tests/runfile/read_yaml_runfile_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})

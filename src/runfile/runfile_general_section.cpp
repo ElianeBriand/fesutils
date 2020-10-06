@@ -40,7 +40,8 @@ namespace fesutils {
         } else {
             options.loglevel = LogLevel::info;
         }
-
+        // LCOV_EXCL_START
+        // Reason for coverage exclusion: difficult to check
         if (options.loglevel == fesutils::LogLevel::debug) {
             setup_log_level_filter(false, false);
             BOOST_LOG_TRIVIAL(debug) << "Debug messages enabled";
@@ -49,6 +50,7 @@ namespace fesutils {
         } else {
             setup_log_level_filter(true, false);
         }
+        // LCOV_EXCL_STOP
 
         if (general_node["binary_cache_policy"]) {
             options.binaryCachePolicy = string_to_BinaryCachePolicy(general_node["binary_cache_policy"].as<std::string>());
@@ -60,7 +62,7 @@ namespace fesutils {
             options.ui_bling = general_node["ui_bling"].as<bool>();
 
         } else {
-            options.binaryCachePolicy = BinaryCachePolicy::never;
+            options.ui_bling = false;
         }
 
 

@@ -32,7 +32,7 @@
 
 
 namespace fesutils {
-        void read_yaml_runfile(GeneralOptions options,
+        void read_yaml_runfile(GeneralOptions& options,
         const std::string& runfile_path) {
 
 
@@ -44,7 +44,6 @@ namespace fesutils {
                 YAML::Node general_node = runfile_yaml["general"];
 
                 parse_general_section(options, general_node);
-
 
 
             } else {
