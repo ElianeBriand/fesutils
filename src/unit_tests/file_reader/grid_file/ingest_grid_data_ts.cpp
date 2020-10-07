@@ -73,6 +73,25 @@ namespace {
                                               0x1F, 0x0B, 0x00, 0x00, // Size of original file in byte
                                               0xDE, 0xAD, 0xBE, 0xEF // Dummy data
     };
+
+    std::string grid_with_duplicate_line = "#! FIELDS fragment_position.x fragment_position.y fragment_position.z metad_position.bias der_fragment_position.x der_fragment_position.y der_fragment_position.z\n"
+                                    "#! SET min_fragment_position.x 0.88\n"
+                                    "#! SET max_fragment_position.x 10.06\n"
+                                    "#! SET nbins_fragment_position.x  185\n"
+                                    "#! SET periodic_fragment_position.x false\n"
+                                    "#! SET min_fragment_position.y 3.09\n"
+                                    "#! SET max_fragment_position.y 14.22\n"
+                                    "#! SET nbins_fragment_position.y  224\n"
+                                    "#! SET periodic_fragment_position.y false\n"
+                                    "#! SET min_fragment_position.z -1.86\n"
+                                    "#! SET max_fragment_position.z 9.70\n"
+                                    "#! SET nbins_fragment_position.z  233\n"
+                                    "#! SET periodic_fragment_position.z false\n"
+                                    "    0.880000000    3.090000000   -1.860000000   11.000000000    0.000000000    0.000000000    0.000000000\n"
+                                    "    0.929891304    3.090000000   -1.860000000    2.000000000    0.000000000    0.000000000    0.000000000\n"
+                                    "    0.929891304    3.090000000   -1.860000000    2.000000000    0.000000000    0.000000000    0.000000000\n"
+                                    "    1.029673913    3.090000000   -1.860000000  253.000000000    0.000000000    0.000000000    0.000000000\n";
+
 }
 
 namespace f = fesutils;
@@ -137,6 +156,25 @@ BOOST_AUTO_TEST_SUITE(ingest_grid_data_ts)
         grid->get_value_at_coord_rangechecked(coord, value, idx_buffer);
 
         BOOST_TEST(value == 1.2);
+
+    }
+
+    BOOST_AUTO_TEST_CASE(grid_file_with_duplicated_line_tc, *boost::unit_test::tolerance(0.001)) {
+        TempDirectory td;
+        bf::path td_path = td.getDirPath();
+        std::shared_ptr<TempTextFile>  temp_file = td.createTemporaryFileInDir("GRID_fragment_test",
+                                                                               grid_with_duplicate_line);
+        bf::path grid_file_path = temp_file->getFilePath();
+
+
+        f::GeneralOptions options;
+
+        f::PlumedDatHeader header = f::read_plumed_file_header(temp_file->getName());
+
+        BOOST_CHECK_THROW(
+                f::ingest_grid_data(options,grid_file_path,header,3,{0,1,2}),
+                std::runtime_error
+        );
 
     }
 

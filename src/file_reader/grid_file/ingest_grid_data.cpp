@@ -201,6 +201,20 @@ namespace fesutils {
 
         progress_printer.finish();
 
+        // Check that the grid file loaded only one or no value into each grid voxel
+        // If not, then there was overwriting, this most probably indicates a problem
+        // Or at least that the process could not be parallelized safely
+        // (Post hoc check as normally grid file do abide by this)
+
+        bool correct_write_access_pattern = griddata_container->check_no_or_one_write_access_everywhere();
+
+        if(!correct_write_access_pattern) {
+            BOOST_LOG_TRIVIAL(error) << "The grid file contain lines that resolve to the same voxel in the Grid";
+            BOOST_LOG_TRIVIAL(error) << "This is not supposed to happen, and might be a bug in this program";
+            BOOST_LOG_TRIVIAL(error) << "or that the grid file provided contain multiple grid";
+            BOOST_LOG_TRIVIAL(error) << "(For fast parallel loading to be correct, each voxel must be set 0 or 1 time only.)";
+            throw std::runtime_error("Grid file contains multiple value for single voxel");
+        }
 
 
         return true;
