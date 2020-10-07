@@ -32,11 +32,12 @@ namespace fesutils {
                        std::vector<unsigned int> bins_per_axis_,
                        std::vector<double> min_bin_value_per_axis_,
                        std::vector<double> max_bin_value_per_axis_,
-                       bool track_access_number_) :
+                       bool track_write_access_number_) :
                        num_axis(num_axis),
                        bins_per_axis(std::move(bins_per_axis_)),
                        min_bin_value_per_axis(std::move(min_bin_value_per_axis_)),
-                       max_bin_value_per_axis(std::move(max_bin_value_per_axis_)){
+                       max_bin_value_per_axis(std::move(max_bin_value_per_axis_)),
+                       track_write_access_number(track_write_access_number_){
 
         if(this->bins_per_axis.size() != num_axis ||
             this->min_bin_value_per_axis.size() != num_axis ||
@@ -129,20 +130,20 @@ namespace fesutils {
                                        std::vector<unsigned int> bins_per_axis,
                                        std::vector<double> min_bin_value_per_axis,
                                        std::vector<double> max_bin_value_per_axis,
-                                       bool track_access_number)
+                                       bool track_write_access_number)
             : GridData(num_axis,
                        std::move(bins_per_axis),
                        std::move(min_bin_value_per_axis),
                        std::move(max_bin_value_per_axis),
-                       track_access_number),
+                       track_write_access_number),
                        grid_values(this->num_voxels, 0.0){
         BOOST_LOG_TRIVIAL(info) << fmt::format(std::locale("en_US.UTF-8"),
                                                 "InMemoryGridData: Allocating  {:L} bytes for grid ({:L} voxels total)",
                                                 (this->num_voxels * sizeof(double)), this->num_voxels );
-        if(track_access_number) {
+        if(this->track_write_access_number) {
             BOOST_LOG_TRIVIAL(info) << fmt::format(std::locale("en_US.UTF-8"),
                                                    "InMemoryGridData: Access tracking enabled: creating an auxiliary grid of size {:L} bytes",(this->num_voxels * sizeof(int)));
-            access_tracker_grid.insert(access_tracker_grid.begin(), this->num_voxels, 0);
+            this->write_access_tracker_grid.insert(this->write_access_tracker_grid.begin(), this->num_voxels, 0);
         }
 
     }
@@ -188,6 +189,10 @@ namespace fesutils {
         }
         const long int global_index = this->indices_to_globalindex(idx_buffer);
         this->grid_values.at(global_index) = value;
+        if(this->track_write_access_number) {
+            std::scoped_lock lock(this->write_access_tracker_grid_mutex);
+            this->write_access_tracker_grid.at(global_index) += 1;
+        }
         return true;
     }
 
@@ -202,12 +207,19 @@ namespace fesutils {
         return true;
     }
 
+    bool InMemoryGridData::check_no_or_one_write_access_everywhere() {
+        std::scoped_lock lock(this->write_access_tracker_grid_mutex);
+        return std::all_of(this->write_access_tracker_grid.cbegin(),
+                    this->write_access_tracker_grid.cend(),
+                    [](const int& num_write_access){ return num_write_access <= 1; });
+    }
+
     std::shared_ptr<GridData> GridData_factory(GridData_storage_class grid_storage_class,
                                                unsigned int num_axis,
                                              std::vector<unsigned int> bins_per_axis,
                                              std::vector<double> min_bin_value_per_axis,
                                              std::vector<double> max_bin_value_per_axis,
-                                             bool track_access_number) {
+                                             bool track_write_access_number) {
         std::shared_ptr<GridData> new_griddata_object;
 
         if(grid_storage_class == fesutils::GridData_storage_class::inmemory) {
@@ -215,7 +227,7 @@ namespace fesutils {
                                                                      std::move(bins_per_axis),
                                                                      std::move(min_bin_value_per_axis),
                                                                      std::move(max_bin_value_per_axis),
-                                                                     track_access_number);
+                                                                     track_write_access_number);
         } else {
             // LCOV_EXCL_START
             // Reason for coverage exclusion: Difficult to generate incorrect values for enum class
