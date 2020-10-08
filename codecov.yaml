@@ -30,3 +30,4 @@ ignore:
   - 'src/*_fontend.cpp'
   - 'docs/'
   - 'bundled-deps/*'
+  - 'bundled-deps'
