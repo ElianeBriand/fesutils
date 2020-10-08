@@ -1,0 +1,31 @@
+# This is file to test the load fes data step with dummy data
+# fesutils should exit normally if the examples directory has
+# all the required files
+
+general:
+    title: "Reweight & fragment reconstruction"
+    log_level: debug
+    binary_cache_policy: always
+    ui_bling: true # Enables progress bar & co. Disable if non-interactive batch
+
+search_directory:
+    all: "./examples/"
+
+fes_data:
+    bzn:
+        name: "Benzene"
+        cv_varnames:
+            - "fragment_position.x"
+            - "fragment_position.y"
+            - "fragment_position.z"
+        wall_bias_varnames:
+            - "wall_lower.bias"
+            - "wall_upper.bias"
+        metad_bias_varname: "metad_position.bias"
+        cv_filename_hint: "CV_fragment_benzene"
+        hills_filename_hint: "HILLS_fragment_benzene"
+        grid_filename_hint: "GRID_fragment_benzene_shortened"
+
+### Batch steps ####
+steps:
+    - fes_data : [bzn]

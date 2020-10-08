@@ -177,7 +177,7 @@ target_precompile_headers(fesutils
         )
 endif()
 
-set(SYSTEM_TEST_FILENAMES_STEMS st_final_bias_reweight st_reconstruct_from_fragments)
+set(SYSTEM_TEST_FILENAMES_STEMS st_final_bias_reweight st_reconstruct_from_fragments st_load_fes_data st_utils)
 
 foreach(SysTestFile IN LISTS SYSTEM_TEST_FILENAMES_STEMS)
     add_custom_command(
@@ -230,7 +230,7 @@ set(TEST_SOURCE_LIST
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})
 target_compile_definitions(complete_test_suite PUBLIC BOOST_LOG_DYN_LINK)
-
+add_dependencies(complete_test_suite fesutils)
 target_link_libraries(complete_test_suite ${LIBRARY_LINK_LIST})
 
 if(NOT SANITIZER_BUILD)
@@ -254,7 +254,6 @@ foreach(SysTestFile IN LISTS SYSTEM_TEST_FILENAMES_STEMS)
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMAND python3 ${SysTestFile}.py)
 endforeach()
-
 
 
 add_test(fesutils_unittest complete_test_suite --catch_system_error=yes --log_level=all )

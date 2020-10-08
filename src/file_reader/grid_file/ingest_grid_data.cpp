@@ -166,7 +166,7 @@ namespace fesutils {
 
         tbb::flow::function_node<std::shared_ptr<std::vector<std::string>>,
                 std::shared_ptr<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>, tbb::flow::queueing>
-                double_parser_grid(g_griddata, 1, parse_space_separated_double_node(header_grid.fields.size()));
+                double_parser_grid(g_griddata, 4, parse_space_separated_double_node(header_grid.fields.size()));
 
 
 
