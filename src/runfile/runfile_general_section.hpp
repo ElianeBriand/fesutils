@@ -25,6 +25,7 @@
 #include "../GeneralOptions.h"
 
 
+#include <yaml-cpp/yaml.h>
 
 namespace fesutils {
     void parse_general_section(GeneralOptions& options, YAML::Node& general_node);

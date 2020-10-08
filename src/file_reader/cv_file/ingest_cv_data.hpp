@@ -24,7 +24,7 @@
 #include <boost/filesystem.hpp>
 namespace bf = boost::filesystem;
 
-
+#include "../../file_reader/PlumedDatHeader.hpp"
 #include "../../GeneralOptions.h"
 #include "CVData.hpp"
 

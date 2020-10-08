@@ -22,6 +22,9 @@
 #ifndef FESUTILS_CVDATA_HPP
 #define FESUTILS_CVDATA_HPP
 
+#include <vector>
+#include <memory>
+
 namespace fesutils {
 
     class CVData {

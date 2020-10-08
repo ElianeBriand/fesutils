@@ -22,7 +22,7 @@
 #include "runfile_reweight.hpp"
 #include "runfile_parsed_tree.hpp"
 #include "../common/yaml_utils.hpp"
-
+#include <boost/log/trivial.hpp>
 
 namespace fesutils {
 

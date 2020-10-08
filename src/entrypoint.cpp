@@ -38,6 +38,8 @@ namespace po = boost::program_options;
 namespace f = fesutils;
 
 
+// LCOV_EXCL_START
+// Reason for coverage exclusion: System testing cover this
 
 int main(int argc, char** argv) {
 
@@ -87,3 +89,5 @@ int main(int argc, char** argv) {
     return 0;
 
 }
+
+// LCOV_EXCL_STOP

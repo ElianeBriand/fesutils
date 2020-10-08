@@ -21,6 +21,7 @@
 #define FESUTILS_NOTIMPLEMENTEDERROR_HPP
 
 #include <exception>
+#include <string>
 
 class not_implemented_error: public std::exception
 {
@@ -53,7 +54,7 @@ public:
      *          is in posession of the Exception object. Callers must
      *          not attempt to free the memory.
      */
-    [[nodiscard]] virtual const char* what() const noexcept  {
+    [[nodiscard]] virtual const char* what() const noexcept override  {
         return msg_.c_str();
     }
 

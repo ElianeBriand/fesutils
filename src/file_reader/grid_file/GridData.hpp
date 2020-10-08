@@ -22,8 +22,11 @@
 #ifndef FESUTILS_GRIDDATA_HPP
 #define FESUTILS_GRIDDATA_HPP
 
-namespace fesutils {
+#include <mutex>
+#include <vector>
+#include <memory>
 
+namespace fesutils {
 
     class GridData {
     public:

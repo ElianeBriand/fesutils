@@ -24,7 +24,7 @@ fes_data:
         metad_bias_varname: "metad_position.bias"
         cv_filename_hint: "CV_fragment_benzene"
         hills_filename_hint: "HILLS_fragment_benzene"
-        grid_filename_hint: "GRID_fragment_benzene_shortened"
+        grid_filename_hint: "shortGRID_fragment_benzene"
 
 ### Batch steps ####
 steps:

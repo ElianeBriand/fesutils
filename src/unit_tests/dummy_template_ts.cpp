@@ -25,6 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../GeneralOptions.h"
 
 namespace f = fesutils;
 

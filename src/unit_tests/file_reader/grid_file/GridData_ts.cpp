@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "../../../file_reader/grid_file/GridData.hpp"
-
+#include <fmt/format.h>
 
 namespace f = fesutils;
 

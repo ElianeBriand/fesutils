@@ -5,6 +5,7 @@
 #include "field_function_heuristics.hpp"
 
 #include <algorithm>
+#include <boost/log/trivial.hpp>
 
 #include "PlumedDatHeader.hpp"
 

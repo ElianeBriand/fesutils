@@ -27,7 +27,6 @@
 
 #include "../frontend_common.h"
 
-namespace f = fesutils;
 
 BOOST_AUTO_TEST_SUITE(frontend_common_ts)
 

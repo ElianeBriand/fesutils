@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <iostream>
+#include <fmt/format.h>
 
 #include <boost/test/unit_test.hpp>
 #include "../../../file_reader/grid_file/GridData.hpp"

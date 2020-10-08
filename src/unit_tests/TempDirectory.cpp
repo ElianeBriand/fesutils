@@ -19,7 +19,7 @@
  */
 
 #include "TempDirectory.hpp"
-
+#include <iostream>
 #include <boost/filesystem.hpp>
 namespace bf = boost::filesystem;
 

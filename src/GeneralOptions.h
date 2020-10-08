@@ -22,7 +22,7 @@
 #define FESUTILS_GENERALOPTIONS_H
 
 #include <cstdlib>
-
+#include <map>
 namespace fesutils {
 
 

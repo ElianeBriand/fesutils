@@ -24,6 +24,8 @@
 
 #include "../GeneralOptions.h"
 
+#include <yaml-cpp/yaml.h>
+
 namespace fesutils {
     void parse_search_directory_section(GeneralOptions& options, YAML::Node& search_directory_node);
 

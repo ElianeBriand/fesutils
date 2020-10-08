@@ -14,8 +14,10 @@ move_to_root()
 process = subprocess.Popen([fesutil_bin_path, 'examples/systemtest_load_fes_data.yaml'],
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
-
 process.wait()
+stdout = process.communicate()[0]
+print("{:s}".format(stdout.decode("utf-8")))
+
 
 if process.returncode != 0:
     restore_pretest_state(state)

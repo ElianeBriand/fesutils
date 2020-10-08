@@ -23,6 +23,7 @@
 
 #include <tbb/flow_graph.h>
 
+#include <Eigen/Dense>
 
 #include "CVData.hpp"
 

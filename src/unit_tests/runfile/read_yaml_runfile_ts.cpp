@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <iostream>
-
+#include <fmt/format.h>
 #include <boost/test/unit_test.hpp>
 #include "../TempDirectory.hpp"
 #include "../../GeneralOptions.h"

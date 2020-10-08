@@ -19,6 +19,9 @@
  */
 
 #include "runfile_steps.hpp"
+#include <boost/log/trivial.hpp>
+
+
 #include "../common/yaml_utils.hpp"
 #include "runfile_parsed_tree.hpp"
 
@@ -47,7 +50,7 @@ namespace fesutils {
                 BOOST_LOG_TRIVIAL(error) << "Unexpected step structure (error code 00104)";
                 throw std::runtime_error("Runfile structure error");
             }
-            BOOST_LOG_TRIVIAL(debug) << "Registered steps: function = " << function_str << " | params = " << parameter_sets;
+            BOOST_LOG_TRIVIAL(debug) << "Registered steps: function = " << function_str << " | params = " << parameter_sets.back();
 
             RunfileItem_Step curr_step;
 

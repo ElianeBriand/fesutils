@@ -23,6 +23,8 @@
 
 #include "../../GeneralOptions.h"
 #include "GridData.hpp"
+#include "../../file_reader/PlumedDatHeader.hpp"
+
 
 #include <boost/filesystem.hpp>
 namespace bf = boost::filesystem;

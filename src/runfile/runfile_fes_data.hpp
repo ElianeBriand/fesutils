@@ -23,6 +23,7 @@
 
 #include "../GeneralOptions.h"
 
+#include <yaml-cpp/yaml.h>
 
 
 namespace fesutils {

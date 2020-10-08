@@ -67,7 +67,6 @@ BOOST_AUTO_TEST_SUITE(runfile_steps_ts)
         BOOST_TEST(f::g_remaining_steps_lists.size() == 2);
         BOOST_REQUIRE(f::g_remaining_steps_lists.size() == 2);
 
-        f::g_all_steps_list.front().parameter_set_names;
         BOOST_TEST(f::g_all_steps_list.at(0).function == f::StepFunction::fes_data);
         BOOST_TEST(f::g_all_steps_list.at(1).function == f::StepFunction::reweight);
 

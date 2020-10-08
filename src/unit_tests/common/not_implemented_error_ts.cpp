@@ -27,8 +27,6 @@
 #include "../../common/NotImplementedError.hpp"
 
 
-namespace f = fesutils;
-
 BOOST_AUTO_TEST_SUITE(not_implemented_error_ts)
 
     BOOST_AUTO_TEST_CASE(ctor_tc, *boost::unit_test::tolerance(0.001)) {
