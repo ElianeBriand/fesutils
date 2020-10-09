@@ -18,6 +18,8 @@ mkdir build_cov
 export GCOV_PREFIX=`pwd`/build_cov/data
 cd build_cov
 export GCOV_PREFIX_STRIP=`pwd | awk -F"/" '{print NF-1}'`
+echo $GCOV_PREFIX
+echo $GCOV_PREFIX_STRIP
 
 cmake .. -DCOVERAGE_BUILD=ON -DCMAKE_BUILD_TYPE=Debug
 
@@ -30,6 +32,8 @@ cp --parents `find . -name '*.gcno'` ../data
 cd ..
 export GCOV_PREFIX=`pwd`
 export GCOV_PREFIX_STRIP=`pwd | awk -F"/" '{print NF-1}'`
+echo $GCOV_PREFIX
+echo $GCOV_PREFIX_STRIP
 make fesutils_coverage
 if [[ $SEND != 0 ]] ;
 then
