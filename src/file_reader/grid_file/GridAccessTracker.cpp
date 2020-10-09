@@ -47,7 +47,10 @@ namespace fesutils {
                                                             this->bin_width_per_axis);
 
         if(!in_range) {
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: Defensive check only, caller will in most case already have range checked
             return false;
+            // LCOV_EXCL_STOP
         }
 
         const long int global_idx = this->indices_to_globalindex(idx_buffer);

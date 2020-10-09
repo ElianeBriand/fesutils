@@ -26,8 +26,7 @@ comment:
   require_changes: no
 
 ignore:
-  - '*/src/unit_tests/*'
-  - '*/src/*_fontend.cpp'
-  - '*/docs/'
-  - '*/bundled-deps/*'
-  - '*/bundled-deps'
+  - '**/unit_tests/**'
+  - '*_fontend.cpp'
+  - '**/docs/**'
+  - '**/bundled-deps/**'

@@ -158,7 +158,9 @@ set(SOURCE_LIST
                 src/common/NotImplementedError.cpp
                 src/common/NotImplementedError.hpp
                 src/file_reader/grid_file/GridAccessTracker.cpp
-                src/file_reader/grid_file/GridAccessTracker.hpp)
+                src/file_reader/grid_file/GridAccessTracker.hpp
+                src/block_analysis/cv_space_coverage.cpp
+                src/block_analysis/cv_space_coverage.hpp)
 
 set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt yaml-cpp)
 
