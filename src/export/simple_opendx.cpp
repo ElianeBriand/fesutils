@@ -8,7 +8,6 @@
 
 
 #include "simple_opendx.hpp"
-#include "../grid/grid_utils.hpp"
 
 namespace fesutils {
 

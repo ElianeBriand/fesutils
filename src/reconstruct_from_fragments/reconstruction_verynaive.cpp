@@ -20,7 +20,6 @@
 
 #include "reconstruction_verynaive.hpp"
 #include "reconstruction_utils.hpp"
-#include "../grid/grid_utils.hpp"
 
 #include <boost/log/trivial.hpp>
 

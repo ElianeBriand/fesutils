@@ -34,7 +34,6 @@
 #include "../common/print_lines_node.hpp"
 #include "../common/dummy_sink_node.hpp"
 #include "../file_reader/parse_space_separated_values_node.hpp"
-#include "../grid/grid_utils.hpp"
 #include "../common/limiter_decrementer_node.hpp"
 #include "../file_reader/grid_file/grid_filler_node.hpp"
 #include "../progress/progress_printer.hpp"

@@ -33,11 +33,6 @@ namespace f = fesutils;
 
 BOOST_AUTO_TEST_SUITE(grid_access_tracker_ts)
 
-    BOOST_AUTO_TEST_CASE(dummy_test_case_1_tc, *boost::unit_test::tolerance(0.001)) {
-
-
-    }
-
     BOOST_AUTO_TEST_CASE(write_access_tracker_tc, *boost::unit_test::tolerance(0.001)) {
 
         // PRELUDE

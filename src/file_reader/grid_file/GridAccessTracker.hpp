@@ -33,7 +33,7 @@ namespace fesutils {
 
     class GridAccessTracker {
     public:
-
+        explicit GridAccessTracker(const GridData& grid);
 
         bool increment_at_coord_rangechecked(const std::vector<double>& coord,
                                              std::vector<long int>& idx_buffer);
@@ -41,21 +41,22 @@ namespace fesutils {
         bool all_voxel_accessed_n_times_or_less(const int n);
 
     protected:
-        friend GridData;
-        explicit GridAccessTracker(GridData* grid_);
+
 
 
         long int indices_to_globalindex(const std::vector<long int>& indices);
 
-        GridData* grid;
-        unsigned int num_axis;
-        unsigned int num_voxels;
-        std::vector<unsigned int> bins_per_axis;
+        const unsigned int num_axis;
+        const unsigned int num_voxels;
+        const std::vector<std::tuple<double, double>> axis_range_minmax;
+        const std::vector<double> bin_width_per_axis;
+        const std::vector<unsigned int> bins_per_axis;
 
         std::mutex write_access_tracker_grid_mutex;
         std::vector<int> write_access_tracker_grid;
 
     };
+
 
 }
 

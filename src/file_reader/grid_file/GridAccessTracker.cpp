@@ -25,11 +25,12 @@
 namespace fesutils {
 
 
-    GridAccessTracker::GridAccessTracker(GridData* grid_) :
-    grid(grid_),
-    num_axis(grid->get_num_axis()),
-    num_voxels(grid->get_num_voxels()),
-    bins_per_axis(grid->get_bins_per_axis()),
+    GridAccessTracker::GridAccessTracker(const GridData& grid) :
+    num_axis(grid.get_num_axis()),
+    num_voxels(grid.get_num_voxels()),
+    axis_range_minmax(grid.get_minmax_range_per_axis()),
+    bin_width_per_axis(grid.get_bin_width_per_axis()),
+    bins_per_axis(grid.get_bins_per_axis()),
     write_access_tracker_grid(num_voxels, 0)
     {
         BOOST_LOG_TRIVIAL(info) << fmt::format(
@@ -38,13 +39,15 @@ namespace fesutils {
 
     bool GridAccessTracker::increment_at_coord_rangechecked(const std::vector<double>& coord,
                                                             std::vector<long>& idx_buffer) {
-        bool in_range =  grid->coord_to_indices_rangechecked(coord,
-                                                       idx_buffer);
+
+        bool in_range =  common_coord_to_indices_rangechecked(coord,
+                                                              idx_buffer,
+                                                            this->num_axis,
+                                                            this->axis_range_minmax,
+                                                            this->bin_width_per_axis);
+
         if(!in_range) {
-            // LCOV_EXCL_START
-            // Reason for coverage exclusion: defensive check, as GridData already checks for range
             return false;
-            // LCOV_EXCL_STOP
         }
 
         const long int global_idx = this->indices_to_globalindex(idx_buffer);

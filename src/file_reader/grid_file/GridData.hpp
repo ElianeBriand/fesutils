@@ -31,6 +31,13 @@ namespace fesutils {
 
     class GridAccessTracker;
 
+
+    bool common_coord_to_indices_rangechecked(const std::vector<double>& coord,
+                                              std::vector<long int>& idx_buffer,
+                                              const unsigned int& num_axis,
+                                              const std::vector<std::tuple<double, double>>& axis_range_minmax,
+                                              const std::vector<double>& bin_width_per_axis);
+
     class GridData {
     public:
         GridData(unsigned int num_axis,
@@ -39,24 +46,26 @@ namespace fesutils {
                  std::vector<double> max_bin_value_per_axis);
         ~GridData() = default;
 
-        virtual const unsigned int& get_num_axis();
+        virtual const unsigned int& get_num_axis() const;
 
-        virtual const unsigned int& get_num_voxels();
+        virtual const unsigned int& get_num_voxels() const;
 
 
-        virtual const std::vector<unsigned int>& get_bins_per_axis();
+        virtual const std::vector<unsigned int>& get_bins_per_axis() const;
 
-        virtual const std::vector<double>& get_min_bin_value_per_axis();
+        virtual const std::vector<double>& get_min_bin_value_per_axis() const;
 
-        virtual const std::vector<double>& get_max_bin_value_per_axis();
+        virtual const std::vector<double>& get_max_bin_value_per_axis() const;
 
-        virtual const std::vector<double>& get_bin_width_per_axis();
+        virtual const std::vector<std::tuple<double, double>>& get_minmax_range_per_axis() const;
 
-        virtual const std::vector<std::vector<double>>& get_bin_edges_per_axis();
+        virtual const std::vector<double>& get_bin_width_per_axis() const;
 
-        virtual const std::vector<std::vector<double>>& get_bin_centers_per_axis();
+        virtual const std::vector<std::vector<double>>& get_bin_edges_per_axis() const;
 
-        virtual const bool& has_small_bin_width();
+        virtual const std::vector<std::vector<double>>& get_bin_centers_per_axis() const;
+
+        virtual const bool& has_small_bin_width() const;
 
         bool coord_to_indices_rangechecked(const std::vector<double>& coord, std::vector<long int>& idx_buffer);
 

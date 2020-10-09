@@ -21,6 +21,7 @@
 #include "GridData.hpp"
 
 #include <locale>
+#include <memory>
 #include <tuple>
 #include <fmt/format.h>
 
@@ -91,35 +92,35 @@ namespace fesutils {
     }
 
 
-    const unsigned int& GridData::get_num_axis() {
+    const unsigned int& GridData::get_num_axis() const{
         return this->num_axis;
     }
 
-    const unsigned int& GridData::get_num_voxels() {
+    const unsigned int& GridData::get_num_voxels() const{
         return this->num_voxels;
     }
 
-    const std::vector<unsigned int>& GridData::get_bins_per_axis() {
+    const std::vector<unsigned int>& GridData::get_bins_per_axis() const{
         return this->bins_per_axis;
     }
 
-    const std::vector<double>& GridData::get_min_bin_value_per_axis() {
+    const std::vector<double>& GridData::get_min_bin_value_per_axis() const{
         return this->min_bin_value_per_axis;
     }
 
-    const std::vector<double>& GridData::get_max_bin_value_per_axis() {
+    const std::vector<double>& GridData::get_max_bin_value_per_axis() const{
         return this->max_bin_value_per_axis;
     }
 
-    const std::vector<double>& GridData::get_bin_width_per_axis() {
+    const std::vector<double>& GridData::get_bin_width_per_axis() const{
         return this->bin_width_per_axis;
     }
 
-    const std::vector<std::vector<double>>& GridData::get_bin_edges_per_axis() {
+    const std::vector<std::vector<double>>& GridData::get_bin_edges_per_axis() const{
         return this->bin_edges_per_axis;
     }
 
-    const std::vector<std::vector<double>>& GridData::get_bin_centers_per_axis() {
+    const std::vector<std::vector<double>>& GridData::get_bin_centers_per_axis() const {
         return this->bin_centers_per_axis;
     }
 
@@ -143,17 +144,11 @@ namespace fesutils {
 
 
     bool GridData::coord_to_indices_rangechecked(const std::vector<double>& coord, std::vector<long int>& idx_buffer)  {
-        for(unsigned int axis = 0; axis < this->num_axis; axis++) {
-            const auto [range_min, range_max] = this->axis_range_minmax[axis];
-            if(coord[axis] < range_min || coord[axis] > range_max) {
-                return false;
-            }
-            const double abs_coord = coord[axis] - range_min;
-            const double continuous_bin_index =  abs_coord / bin_width_per_axis[axis];
-            const long int bin_index = std::floor(continuous_bin_index);
-            idx_buffer[axis] = bin_index;
-        }
-        return true;
+        return common_coord_to_indices_rangechecked(coord,
+                                                    idx_buffer,
+                                                    this->num_axis,
+                                                    this->axis_range_minmax,
+                                                    this->bin_width_per_axis);
     }
 
     long int GridData::indices_to_globalindex(const std::vector<long int>& indices) {
@@ -170,7 +165,7 @@ namespace fesutils {
         return global_index;
     }
 
-    const bool& GridData::has_small_bin_width() {
+    const bool& GridData::has_small_bin_width() const {
         return this->has_small_bin_width_;
     }
 
@@ -206,7 +201,11 @@ namespace fesutils {
 
     void GridData::enable_parallel_write_check() {
         this->track_write_access_number = true;
-        this->grid_access_tracker = std::shared_ptr<GridAccessTracker>(new GridAccessTracker(this));
+        this->grid_access_tracker = std::make_shared<GridAccessTracker>(*this);
+    }
+
+    const std::vector<std::tuple<double, double>>& GridData::get_minmax_range_per_axis() const {
+        return this->axis_range_minmax;
     }
 
     std::shared_ptr<GridData> GridData_factory(GridData_storage_class grid_storage_class,
@@ -235,6 +234,27 @@ namespace fesutils {
 
         return new_griddata_object;
     }
+
+
+    bool common_coord_to_indices_rangechecked(const std::vector<double>& coord,
+                                              std::vector<long>& idx_buffer,
+                                              const unsigned int& num_axis,
+                                              const std::vector<std::tuple<double, double>>& axis_range_minmax,
+                                              const std::vector<double>& bin_width_per_axis) {
+        for(unsigned int axis = 0; axis < num_axis; axis++) {
+            const auto [range_min, range_max] = axis_range_minmax[axis];
+            if(coord[axis] < range_min || coord[axis] > range_max) {
+                return false;
+            }
+            const double abs_coord = coord[axis] - range_min;
+            const double continuous_bin_index =  abs_coord / bin_width_per_axis[axis];
+            const long int bin_index = std::floor(continuous_bin_index);
+            idx_buffer[axis] = bin_index;
+        }
+        return true;
+    }
+
+
 }
 
 

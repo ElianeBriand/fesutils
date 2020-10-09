@@ -68,6 +68,11 @@ int main(int argc, char** argv) {
 
     po::store(parsed, vm);
 
+    if(!vm.count("RUNFILE")) {
+        BOOST_LOG_TRIVIAL(info) << "Please add a runfile argument.";
+        return 1;
+    }
+
     std::string runfile_path = vm["RUNFILE"].as<std::string>();
 
     f::read_yaml_runfile(options, runfile_path);

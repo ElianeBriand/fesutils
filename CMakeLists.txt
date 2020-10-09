@@ -101,8 +101,6 @@ set(SOURCE_LIST
                 src/file_reader/parse_space_separated_values_node.cpp
                 src/file_reader/parse_space_separated_values_node.hpp
                 src/common/dummy_sink_node.hpp
-                src/grid/grid_utils.cpp
-                src/grid/grid_utils.hpp
                 src/common/limiter_decrementer_node.hpp
                 src/file_reader/grid_file/grid_filler_node.cpp
                 src/file_reader/grid_file/grid_filler_node.hpp
@@ -203,15 +201,11 @@ set(TEST_SOURCE_LIST
         src/unit_tests/TempTextFile.hpp
         src/unit_tests/TempTextFile.cpp
         src/unit_tests/file_reader/parse_space_separated_values_ts.cpp
-        src/unit_tests/grid/grid_utils_ts.cpp
-        src/unit_tests/grid/grid_ts.cpp
         src/unit_tests/MiscFixture.cpp
         src/unit_tests/MiscFixture.hpp
         src/unit_tests/common/misc_ts.cpp
-        src/unit_tests/grid/grid_filler_node_ts.cpp
         src/unit_tests/progress/progress_printer_ts.cpp
         src/unit_tests/file_reader/field_function_heuristics_ts.cpp
-        src/unit_tests/grid/ingest_grid_ts.cpp
         src/unit_tests/TempDirectory.cpp
         src/unit_tests/TempDirectory.hpp
         src/unit_tests/common/find_in_search_directory_ts.cpp

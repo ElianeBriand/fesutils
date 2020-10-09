@@ -265,16 +265,6 @@ namespace fesutils {
         }
     }
 
-    std::vector<size_t> find_fields_index_that_have_required_attribute_for_grid(const PlumedDatHeader& header) {
-        std::vector<size_t> indexes;
-        for(int i = 0; i < header.fields.size(); i++) {
-            const Field field = header.fields[i];
-            if(is_field_a_grid_dimension(field)) {
-                indexes.push_back(i);
-            }
-        }
-        return indexes;
-    }
 
     void remove_nongrid_fields(PlumedDatHeader& header) {
         // Loop until no more nongrid field are found
