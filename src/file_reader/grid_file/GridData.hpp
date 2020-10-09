@@ -25,16 +25,18 @@
 #include <mutex>
 #include <vector>
 #include <memory>
+#include "GridAccessTracker.hpp"
 
 namespace fesutils {
+
+    class GridAccessTracker;
 
     class GridData {
     public:
         GridData(unsigned int num_axis,
                  std::vector<unsigned int> bins_per_axis,
                  std::vector<double> min_bin_value_per_axis,
-                 std::vector<double> max_bin_value_per_axis,
-                 bool track_write_access_number = false);
+                 std::vector<double> max_bin_value_per_axis);
         ~GridData() = default;
 
         virtual const unsigned int& get_num_axis();
@@ -62,7 +64,8 @@ namespace fesutils {
 
         virtual bool get_value_at_coord_rangechecked(const std::vector<double>& coord, double& value, std::vector<long int>& idx_buffer) = 0;
 
-        virtual bool check_no_or_one_write_access_everywhere() = 0;
+        virtual void enable_parallel_write_check();
+        virtual bool parallel_grid_write_posthoc_check();
 
     protected:
         long int indices_to_globalindex(const std::vector<long int>& indices);
@@ -79,7 +82,10 @@ namespace fesutils {
         std::vector<std::tuple<double, double>> axis_range_minmax;
 
         bool has_small_bin_width_ = false;
+
         bool track_write_access_number;
+        std::shared_ptr<GridAccessTracker> grid_access_tracker;
+
 
     };
 
@@ -89,22 +95,18 @@ namespace fesutils {
         InMemoryGridData(unsigned int num_axis,
                          std::vector<unsigned int> bins_per_axis,
                          std::vector<double> min_bin_value_per_axis,
-                         std::vector<double> max_bin_value_per_axis,
-                         bool track_write_access_number = false);
+                         std::vector<double> max_bin_value_per_axis);
         ~InMemoryGridData() = default;
 
         bool insert_at_coord_rangechecked(const std::vector<double>& coord, double value, std::vector<long int>& coord_buffer) final;
 
         bool get_value_at_coord_rangechecked(const std::vector<double>& coord, double& value, std::vector<long int>& idx_buffer) final;
 
-        bool check_no_or_one_write_access_everywhere() final;
 
 
     protected:
         std::vector<double> grid_values;
 
-        std::mutex write_access_tracker_grid_mutex;
-        std::vector<int> write_access_tracker_grid;
     };
 
     enum class GridData_storage_class {

@@ -206,7 +206,7 @@ namespace fesutils {
         // Or at least that the process could not be parallelized safely
         // (Post hoc check as normally grid file do abide by this)
 
-        bool correct_write_access_pattern = griddata_container->check_no_or_one_write_access_everywhere();
+        bool correct_write_access_pattern = griddata_container->parallel_grid_write_posthoc_check();
 
         if(!correct_write_access_pattern) {
             BOOST_LOG_TRIVIAL(error) << "The grid file contain lines that resolve to the same voxel in the Grid";

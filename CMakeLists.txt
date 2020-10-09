@@ -36,7 +36,7 @@ if(COVERAGE_BUILD)
     if(CMAKE_COMPILER_IS_GNUCXX)
         include(CodeCoverage)
         APPEND_COVERAGE_COMPILER_FLAGS()
-        set(COVERAGE_LCOV_EXCLUDES '/usr/*' '*/bundled-deps/*' '*/unit_tests/*' '*/cli_fontend.cpp')
+        set(COVERAGE_LCOV_EXCLUDES '/usr/*' '*/bundled-deps/*'  'bundled-deps/*' '*/unit_tests/*' '*/cli_fontend.cpp')
         SETUP_TARGET_FOR_COVERAGE_LCOV(
                 NAME ${PROJECT_NAME}_coverage                    # New target name
                 EXECUTABLE complete_test_suite # Executable in PROJECT_BINARY_DIR
@@ -83,7 +83,7 @@ set(PCH_SYST_HEADER_LIST
         )
 
 set(SOURCE_LIST
-        src/GeneralOptions.h
+                src/GeneralOptions.h
                 src/final_bias_reweight/final_bias_reweight.hpp
                 src/final_bias_reweight/final_bias_reweight.cpp
                 src/frontend_common.h
@@ -103,15 +103,15 @@ set(SOURCE_LIST
                 src/common/dummy_sink_node.hpp
                 src/grid/grid_utils.cpp
                 src/grid/grid_utils.hpp
-        src/common/limiter_decrementer_node.hpp
-        src/file_reader/grid_file/grid_filler_node.cpp
-        src/file_reader/grid_file/grid_filler_node.hpp
+                src/common/limiter_decrementer_node.hpp
+                src/file_reader/grid_file/grid_filler_node.cpp
+                src/file_reader/grid_file/grid_filler_node.hpp
                 src/progress/progress_printer.cpp
                 src/progress/progress_printer.hpp
                 src/progress/progress_printer_nodes.hpp
                 src/reconstruct_from_fragments/reconstruct_from_fragments.cpp
                 src/reconstruct_from_fragments/reconstruct_from_fragments.hpp
-        src/file_reader/field_function_heuristics.cpp
+                src/file_reader/field_function_heuristics.cpp
                 src/file_reader/field_function_heuristics.hpp
                 src/reconstruct_from_fragments/reconstruction_verynaive.cpp
                 src/reconstruct_from_fragments/reconstruction_verynaive.hpp
@@ -140,24 +140,27 @@ set(SOURCE_LIST
                 src/common/yaml_utils.hpp
                 src/runfile/runfile_steps_executor.cpp
                 src/runfile/runfile_steps_executor.hpp
-        src/steps/step_fes_data.cpp
-        src/steps/step_fes_data.hpp
-        src/frontend_common.cpp
-        src/file_reader/cv_file/CVData.cpp
-        src/file_reader/cv_file/CVData.hpp
-        src/file_reader/cv_file/ingest_cv_data.cpp
-        src/file_reader/cv_file/ingest_cv_data.hpp
-        src/export/array_bindump.cpp
-        src/export/array_bindump.hpp
-        src/file_reader/cv_file/CVData_filler_node.cpp
-        src/file_reader/cv_file/CVData_filler_node.hpp
-        src/file_reader/hills_file/HillsData.cpp
-        src/file_reader/hills_file/HillsData.hpp
-        src/file_reader/grid_file/GridData.cpp
-        src/file_reader/grid_file/GridData.hpp
-        src/file_reader/grid_file/ingest_grid_data.cpp
-        src/file_reader/grid_file/ingest_grid_data.hpp
-        src/common/NotImplementedError.cpp src/common/NotImplementedError.hpp)
+                src/steps/step_fes_data.cpp
+                src/steps/step_fes_data.hpp
+                src/frontend_common.cpp
+                src/file_reader/cv_file/CVData.cpp
+                src/file_reader/cv_file/CVData.hpp
+                src/file_reader/cv_file/ingest_cv_data.cpp
+                src/file_reader/cv_file/ingest_cv_data.hpp
+                src/export/array_bindump.cpp
+                src/export/array_bindump.hpp
+                src/file_reader/cv_file/CVData_filler_node.cpp
+                src/file_reader/cv_file/CVData_filler_node.hpp
+                src/file_reader/hills_file/HillsData.cpp
+                src/file_reader/hills_file/HillsData.hpp
+                src/file_reader/grid_file/GridData.cpp
+                src/file_reader/grid_file/GridData.hpp
+                src/file_reader/grid_file/ingest_grid_data.cpp
+                src/file_reader/grid_file/ingest_grid_data.hpp
+                src/common/NotImplementedError.cpp
+                src/common/NotImplementedError.hpp
+                src/file_reader/grid_file/GridAccessTracker.cpp
+                src/file_reader/grid_file/GridAccessTracker.hpp)
 
 set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt yaml-cpp)
 
@@ -225,7 +228,15 @@ set(TEST_SOURCE_LIST
         src/unit_tests/progress/progress_printer_node_ts.cpp
         src/unit_tests/file_reader/grid_file/grid_filler_node_ts.cpp
         src/unit_tests/file_reader/grid_file/ingest_grid_data_ts.cpp
-        src/unit_tests/common/not_implemented_error_ts.cpp src/unit_tests/runfile/runfile_fes_data_ts.cpp src/unit_tests/runfile/runfile_general_ts.cpp src/unit_tests/runfile/runfile_parsed_tree_ts.cpp src/unit_tests/runfile/runfile_reweight_ts.cpp src/unit_tests/runfile/runfile_search_directory_ts.cpp src/unit_tests/runfile/runfile_steps_ts.cpp src/unit_tests/runfile/read_yaml_runfile_ts.cpp)
+        src/unit_tests/common/not_implemented_error_ts.cpp
+        src/unit_tests/runfile/runfile_fes_data_ts.cpp
+        src/unit_tests/runfile/runfile_general_ts.cpp
+        src/unit_tests/runfile/runfile_parsed_tree_ts.cpp
+        src/unit_tests/runfile/runfile_reweight_ts.cpp
+        src/unit_tests/runfile/runfile_search_directory_ts.cpp
+        src/unit_tests/runfile/runfile_steps_ts.cpp
+        src/unit_tests/runfile/read_yaml_runfile_ts.cpp
+        src/unit_tests/file_reader/grid_file/GridAccessTracker_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})
