@@ -232,7 +232,7 @@ set(TEST_SOURCE_LIST
         src/unit_tests/runfile/runfile_search_directory_ts.cpp
         src/unit_tests/runfile/runfile_steps_ts.cpp
         src/unit_tests/runfile/read_yaml_runfile_ts.cpp
-        src/unit_tests/file_reader/grid_file/GridAccessTracker_ts.cpp)
+        src/unit_tests/file_reader/grid_file/GridAccessTracker_ts.cpp src/unit_tests/file_reader/cv_file/CVData_span_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})

@@ -103,5 +103,44 @@ BOOST_AUTO_TEST_SUITE(cv_data_ts)
 
     }
 
+    BOOST_AUTO_TEST_CASE(cv_data_retrieve_tc, *boost::unit_test::tolerance(0.001)) {
+
+
+        std::shared_ptr<f::CVData> im_cvdata =  CVData_factory(f::CVData_storage_class::inmemory,
+                                                               2,
+                                                               1,
+                                                               10);
+
+        BOOST_REQUIRE(im_cvdata->get_num_record() == 0);
+
+        std::vector<double> datapoint_vector = {0.1, 0.2, 0.3, 0.7, 0.4, 0.8, 0.5, 6.66, 420.69};
+
+        im_cvdata->insertDatapointsVector(datapoint_vector);
+
+        BOOST_REQUIRE(im_cvdata->get_num_record() == 3);
+
+        std::vector<double> dp = im_cvdata->getDatapoint(0);
+        BOOST_TEST(dp == std::vector<double>({0.1, 0.2, 0.3}));
+
+        dp = im_cvdata->getDatapoint(1);
+        BOOST_TEST(dp == std::vector<double>({0.7, 0.4, 0.8}));
+
+        dp = im_cvdata->getDatapoint(2);
+        BOOST_TEST(dp == std::vector<double>({0.5, 6.66, 420.69}));
+
+        im_cvdata->getDatapoint(0, dp);
+        BOOST_TEST(dp == std::vector<double>({0.1, 0.2, 0.3}));
+
+        im_cvdata->getDatapoint(1, dp);
+        BOOST_TEST(dp == std::vector<double>({0.7, 0.4, 0.8}));
+
+        im_cvdata->getDatapoint(2, dp);
+        BOOST_TEST(dp == std::vector<double>({0.5, 6.66, 420.69}));
+
+        BOOST_CHECK_THROW(im_cvdata->getDatapoint(3), std::runtime_error);
+        BOOST_CHECK_THROW(im_cvdata->getDatapoint(3, dp), std::runtime_error);
+
+    }
+
 
 BOOST_AUTO_TEST_SUITE_END();

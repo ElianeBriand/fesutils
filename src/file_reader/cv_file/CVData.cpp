@@ -135,6 +135,29 @@ namespace fesutils {
     }
     // LCOV_EXCL_STOP
 
+    void InMemoryCVData::getDatapoint(size_t index, std::vector<double>& datapoint_buffer) {
+        if(index >= this->number_of_record)
+        {
+            BOOST_LOG_TRIVIAL(error) << "InMemoryCVData::getDatapoint: out of bound access, index = " << index << " but number of record = " << this->number_of_record;
+            throw std::runtime_error("Trying to access out-of bound CVData datapoint");
+        }
+        const size_t array_index = this->total_dim_in_one_record * index;
+        std::copy(this->cv_data_array.begin() + array_index,this->cv_data_array.begin() + array_index + this->total_dim_in_one_record, datapoint_buffer.begin());
+    }
+
+    std::vector<double> InMemoryCVData::getDatapoint(size_t index) {
+        if(index >= this->number_of_record)
+        {
+            BOOST_LOG_TRIVIAL(error) << "InMemoryCVData::getDatapoint: out of bound access, index = " << index << " but number of record = " << this->number_of_record;
+            throw std::runtime_error("Trying to access out-of bound CVData datapoint");
+        }
+        std::vector<double> datapoint;
+        const size_t array_index = this->total_dim_in_one_record * index;
+        datapoint.insert(datapoint.begin(), this->cv_data_array.begin() + array_index,this->cv_data_array.begin() + array_index + this->total_dim_in_one_record);
+        return datapoint;
+    }
+
+
 
     std::shared_ptr<CVData> CVData_factory(CVData_storage_class cv_storage_class,
                                            unsigned int num_cv_dimensions_,
@@ -161,6 +184,65 @@ namespace fesutils {
         return new_cvdata_object;
     }
 
+
+    CVData_span::CVData_span(CVData* underlying_cvdata_, size_t begin_offset_, long int requested_span_size_) :
+            underlying_cvdata(std::move(underlying_cvdata_)),
+            begin_offset(begin_offset_),
+            requested_span_size(requested_span_size_)
+    {
+        if(this->underlying_cvdata == nullptr) {
+            throw std::runtime_error("CVData_span constructor called with null pointer");
+        }
+
+        const size_t underlying_cvdata_size = this->underlying_cvdata->get_num_record();
+        if(this->begin_offset > underlying_cvdata_size) {
+            BOOST_LOG_TRIVIAL(error) << "CVData_span constructor called with offset beyond end of CVData";
+            BOOST_LOG_TRIVIAL(error) << "CVData->size = " << underlying_cvdata_size
+            << " | begin_offset = " << this->begin_offset << " | requested_span_size = " << this->requested_span_size;
+            throw std::runtime_error("CVData_span constructor called with offset beyond end of CVData");
+        }
+
+        if(this->requested_span_size == -1) {
+            // -1 codes for remainder of the CVData
+            this->actual_size = underlying_cvdata_size - this->begin_offset;
+            this->end_offset = this->begin_offset + this->actual_size;
+        } else if(this->requested_span_size < -1) {
+            BOOST_LOG_TRIVIAL(error) << "CVData_span constructor called with requested_span_size = " << this->requested_span_size
+            << " which is not a valid span size (allowed size -1, 0 and positive integer)";
+            throw std::runtime_error("CVData_span constructor called with invalid requested_span_size");
+        } else {
+            // Actual size of span requested
+            if( ( this->begin_offset + this->requested_span_size) > underlying_cvdata_size) {
+                // The span extends past the end: reduce it to fill the remaining space instead
+                this->actual_size = underlying_cvdata_size - this->begin_offset;
+                this->end_offset = this->begin_offset + this->actual_size;
+            } else {
+                this->actual_size = this->requested_span_size;
+                this->end_offset = this->begin_offset + this->requested_span_size;
+            }
+        }
+
+
+    }
+
+    bool CVData_span::is_requested_span_size() const {
+        if(this->requested_span_size == -1)
+            return true;
+        else
+            return this->actual_size == this->requested_span_size;
+    }
+
+    size_t CVData_span::get_begin_offset() const {
+        return begin_offset;
+    }
+
+    size_t CVData_span::get_end_offset() const {
+        return end_offset;
+    }
+
+    size_t CVData_span::get_actual_size() const {
+        return actual_size;
+    }
 
 
 }
