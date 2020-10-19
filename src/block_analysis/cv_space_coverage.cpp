@@ -24,4 +24,23 @@
 namespace fesutils {
 
 
+    std::shared_ptr<GridAccessTracker> count_sampled_voxel_in_CVData(const CVData& cv_data,
+                                                                     const GridData& gridData) {
+        std::shared_ptr<GridAccessTracker> gat = std::make_shared<GridAccessTracker>(gridData);
+
+        const size_t num_records = cv_data.get_num_record();
+        const unsigned int num_cv_dimensions = cv_data.get_num_cv_dimensions();
+
+        std::vector<double> datapoint_buffer(cv_data.get_total_dim_in_one_record(), 0.0);
+        std::vector<double> cv_buffer(num_cv_dimensions, 0.0);
+        std::vector<long int> idx_buffer(num_cv_dimensions, 0);
+
+        for(size_t i = 0; i < num_records; i++) {
+            cv_data.getDatapoint(i, datapoint_buffer);
+            std::copy(datapoint_buffer.begin(), datapoint_buffer.begin() + num_cv_dimensions, cv_buffer.begin());
+            gat->increment_at_coord_rangechecked(cv_buffer, idx_buffer);
+        }
+
+        return gat;
+    }
 }

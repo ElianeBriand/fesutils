@@ -83,4 +83,30 @@ namespace fesutils {
                            this->write_access_tracker_grid.cend(),
                            [&](const int& num_write_access){ return num_write_access <= n; });
     }
+
+    bool GridAccessTracker::access_number_at_coord_rangechecked(const std::vector<double>& coord,
+                                                               std::vector<long>& idx_buffer,
+                                                                int& result) {
+        bool in_range =  common_coord_to_indices_rangechecked(coord,
+                                                              idx_buffer,
+                                                              this->num_axis,
+                                                              this->axis_range_minmax,
+                                                              this->bin_width_per_axis);
+
+        if(!in_range) {
+            // LCOV_EXCL_START
+            // Reason for coverage exclusion: Defensive check only, caller will in most case already have range checked
+            return false;
+            // LCOV_EXCL_STOP
+        }
+
+        const long int global_idx = this->indices_to_globalindex(idx_buffer);
+
+        {
+            std::scoped_lock lock(this->write_access_tracker_grid_mutex);
+            result = this->write_access_tracker_grid[global_idx];
+        }
+
+        return true;
+    }
 }

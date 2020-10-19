@@ -18,18 +18,18 @@
  *
  */
 
-
-#ifndef FESUTILS_CV_SPACE_COVERAGE_HPP
-#define FESUTILS_CV_SPACE_COVERAGE_HPP
-
-#include "../file_reader/grid_file/GridAccessTracker.hpp"
-#include "../file_reader/cv_file/CVData.hpp"
+#include "step_reweight.hpp"
 
 namespace fesutils {
 
-        std::shared_ptr<GridAccessTracker> count_sampled_voxel_in_CVData(const CVData& cv_data,
-                                                                         const GridData& gridData);
+
+    // LCOV_EXCL_START
+    // Reason for coverage exclusion: Would in essence be an integration test, not unit test
+
+    bool run_reweight_step(GeneralOptions options, const std::string& parameter_set_name) {
+        return false;
+    }
+
+    // LCOV_EXCL_STOP
 
 }
-
-#endif //FESUTILS_CV_SPACE_COVERAGE_HPP

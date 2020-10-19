@@ -47,6 +47,12 @@ fes_data:
         cv_filename_hint: "CV_fragment_piperidine"
         hills_filename_hint: "HILLS_fragment_piperidine"
 
+block_analysis:
+    block_all:
+        method: coverage_mean
+        wall_reached: discard
+        data: [meac, bzn, pip]
+        
 reweight:
     rw_all:
         method: reweight_no_interp

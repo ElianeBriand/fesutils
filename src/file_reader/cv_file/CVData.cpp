@@ -63,19 +63,19 @@ namespace fesutils {
 
     }
 
-    const unsigned int& CVData::get_num_cv_dimensions() {
+    const unsigned int& CVData::get_num_cv_dimensions() const {
         return this->num_cv_dimensions;
     }
 
-    const unsigned int& CVData::get_num_value_dimensions() {
+    const unsigned int& CVData::get_num_value_dimensions() const {
         return this->num_value_dimensions;
     }
 
-    const unsigned int& CVData::get_total_dim_in_one_record() {
+    const unsigned int& CVData::get_total_dim_in_one_record() const {
         return this->total_dim_in_one_record;
     }
 
-    const size_t& CVData::get_num_record() {
+    const size_t& CVData::get_num_record() const {
         return this->number_of_record;
     }
 
@@ -135,7 +135,7 @@ namespace fesutils {
     }
     // LCOV_EXCL_STOP
 
-    void InMemoryCVData::getDatapoint(size_t index, std::vector<double>& datapoint_buffer) {
+    void InMemoryCVData::getDatapoint(size_t index, std::vector<double>& datapoint_buffer) const {
         if(index >= this->number_of_record)
         {
             BOOST_LOG_TRIVIAL(error) << "InMemoryCVData::getDatapoint: out of bound access, index = " << index << " but number of record = " << this->number_of_record;

@@ -76,6 +76,8 @@ namespace fesutils {
         virtual void enable_parallel_write_check();
         virtual bool parallel_grid_write_posthoc_check();
 
+        virtual std::shared_ptr<GridAccessTracker> get_GridAccessTracker();
+
     protected:
         long int indices_to_globalindex(const std::vector<long int>& indices);
 

@@ -117,4 +117,95 @@ BOOST_AUTO_TEST_SUITE(grid_access_tracker_ts)
 
     }
 
+    BOOST_AUTO_TEST_CASE(count_access_number_tc, *boost::unit_test::tolerance(0.001)) {
+
+        // PRELUDE
+        const unsigned int num_axis = 2;
+        std::vector<unsigned int> bins_per_axis = {5+1, 2+1};
+        std::vector<double> min_bin_value_per_axis = {0.0, 2.0};
+        std::vector<double> max_bin_value_per_axis = {0.5, 4.0};
+        bool track_access_number = true;
+
+        std::shared_ptr<f::GridData> gd = f::GridData_factory(f::GridData_storage_class::inmemory,
+                                                              num_axis,
+                                                              bins_per_axis,
+                                                              min_bin_value_per_axis,
+                                                              max_bin_value_per_axis,
+                                                              track_access_number);
+
+
+
+        std::vector<double> coord_buffer(2, 0.0);
+        std::vector<long int> idx_buffer(2, 0);
+
+        // ACTUAL TEST
+
+        std::shared_ptr<f::GridAccessTracker> grid_access_tracker = gd->get_GridAccessTracker();
+
+
+        coord_buffer = {0.2, 2.4}; // 3rd bin, 1st bin -> index 2, 0
+        idx_buffer = {0, 0};
+        bool in_range = gd->insert_at_coord_rangechecked(coord_buffer, 0.6, idx_buffer);
+        BOOST_TEST(in_range == true);
+        BOOST_REQUIRE(in_range == true);
+
+        int access_number = -1;
+        in_range = grid_access_tracker->access_number_at_coord_rangechecked(coord_buffer, idx_buffer, access_number);
+        BOOST_TEST(in_range == true);
+        BOOST_REQUIRE(in_range == true);
+        BOOST_TEST(access_number == 1);
+
+        access_number = -1;
+        coord_buffer = {0.24, 2.0};
+        in_range = grid_access_tracker->access_number_at_coord_rangechecked(coord_buffer, idx_buffer, access_number);
+        BOOST_TEST(in_range == true);
+        BOOST_REQUIRE(in_range == true);
+        BOOST_TEST(access_number == 1);
+
+        // Insert value in same bin
+        coord_buffer = {0.22, 2.2}; // 3rd bin, 1st bin -> index 2, 0
+        idx_buffer = {0, 0};
+        in_range = gd->insert_at_coord_rangechecked(coord_buffer, 0.8, idx_buffer);
+        BOOST_TEST(in_range == true);
+        BOOST_REQUIRE(in_range == true);
+
+        access_number = -1;
+        coord_buffer = {0.2, 2.4};
+        in_range = grid_access_tracker->access_number_at_coord_rangechecked(coord_buffer, idx_buffer, access_number);
+        BOOST_TEST(in_range == true);
+        BOOST_REQUIRE(in_range == true);
+        BOOST_TEST(access_number == 2);
+
+
+
+
+    }
+
+    BOOST_AUTO_TEST_CASE(request_access_tracker_when_disabled_tc, *boost::unit_test::tolerance(0.001)) {
+
+        // PRELUDE
+        const unsigned int num_axis = 2;
+        std::vector<unsigned int> bins_per_axis = {5+1, 2+1};
+        std::vector<double> min_bin_value_per_axis = {0.0, 2.0};
+        std::vector<double> max_bin_value_per_axis = {0.5, 4.0};
+        bool track_access_number = false;
+
+        std::shared_ptr<f::GridData> gd = f::GridData_factory(f::GridData_storage_class::inmemory,
+                                                              num_axis,
+                                                              bins_per_axis,
+                                                              min_bin_value_per_axis,
+                                                              max_bin_value_per_axis,
+                                                              track_access_number);
+
+
+
+
+        BOOST_CHECK_THROW(gd->get_GridAccessTracker(), std::runtime_error);
+
+
+
+
+    }
+
+
 BOOST_AUTO_TEST_SUITE_END();

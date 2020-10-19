@@ -160,7 +160,11 @@ set(SOURCE_LIST
                 src/file_reader/grid_file/GridAccessTracker.cpp
                 src/file_reader/grid_file/GridAccessTracker.hpp
                 src/block_analysis/cv_space_coverage.cpp
-                src/block_analysis/cv_space_coverage.hpp)
+                src/block_analysis/cv_space_coverage.hpp
+                src/steps/step_block_analysis.cpp
+                src/steps/step_block_analysis.hpp
+                src/steps/step_reweight.cpp
+                src/steps/step_reweight.hpp)
 
 set(LIBRARY_LINK_LIST tbb ${Boost_LIBRARIES} fmt yaml-cpp)
 
@@ -232,7 +236,9 @@ set(TEST_SOURCE_LIST
         src/unit_tests/runfile/runfile_search_directory_ts.cpp
         src/unit_tests/runfile/runfile_steps_ts.cpp
         src/unit_tests/runfile/read_yaml_runfile_ts.cpp
-        src/unit_tests/file_reader/grid_file/GridAccessTracker_ts.cpp src/unit_tests/file_reader/cv_file/CVData_span_ts.cpp)
+        src/unit_tests/file_reader/grid_file/GridAccessTracker_ts.cpp
+         src/unit_tests/file_reader/cv_file/CVData_span_ts.cpp
+          src/unit_tests/block_analysis/cv_space_coverage_ts.cpp)
 
 
 add_executable(complete_test_suite ${TEST_SOURCE_LIST}  ${SOURCE_LIST})

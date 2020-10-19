@@ -17,19 +17,14 @@
  * along with fesutils.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+#ifndef FESUTILS_STEP_REWEIGHT_HPP
+#define FESUTILS_STEP_REWEIGHT_HPP
 
-
-#ifndef FESUTILS_CV_SPACE_COVERAGE_HPP
-#define FESUTILS_CV_SPACE_COVERAGE_HPP
-
-#include "../file_reader/grid_file/GridAccessTracker.hpp"
-#include "../file_reader/cv_file/CVData.hpp"
+#include "../GeneralOptions.h"
 
 namespace fesutils {
 
-        std::shared_ptr<GridAccessTracker> count_sampled_voxel_in_CVData(const CVData& cv_data,
-                                                                         const GridData& gridData);
-
+    bool run_reweight_step(GeneralOptions options, const std::string& parameter_set_name);
 }
 
-#endif //FESUTILS_CV_SPACE_COVERAGE_HPP
+#endif //FESUTILS_STEP_REWEIGHT_HPP

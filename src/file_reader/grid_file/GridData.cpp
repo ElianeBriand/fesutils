@@ -208,6 +208,15 @@ namespace fesutils {
         return this->axis_range_minmax;
     }
 
+    std::shared_ptr<GridAccessTracker> GridData::get_GridAccessTracker() {
+        if(!track_write_access_number) {
+            BOOST_LOG_TRIVIAL(error) << "GridData::get_GridAccessTracker called but write access tracking not enabled!";
+            BOOST_LOG_TRIVIAL(error) << "Likely to be a bug.";
+            throw std::runtime_error("Requested grid access tracker but write access tracker not enabled.");
+        }
+        return grid_access_tracker;
+    }
+
     std::shared_ptr<GridData> GridData_factory(GridData_storage_class grid_storage_class,
                                                unsigned int num_axis,
                                              std::vector<unsigned int> bins_per_axis,

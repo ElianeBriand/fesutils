@@ -45,7 +45,7 @@ namespace fesutils {
          * \param datapoint_buffer
          * \sa get_total_dim_in_one_record, get_num_record
          */
-        virtual void getDatapoint(size_t index, std::vector<double>& datapoint_buffer) = 0;
+        virtual void getDatapoint(size_t index, std::vector<double>& datapoint_buffer) const  = 0;
 
         /**
          * Return datapoint at index offset. The index must be lower than get_num_record().
@@ -57,13 +57,13 @@ namespace fesutils {
 
         virtual void printRecords(unsigned int begin_index, unsigned int num_records) = 0;
 
-        virtual const unsigned int& get_num_cv_dimensions();
+        [[nodiscard]] virtual const unsigned int& get_num_cv_dimensions() const;
 
-        virtual const unsigned int& get_num_value_dimensions();
+        [[nodiscard]] virtual const unsigned int& get_num_value_dimensions() const;
 
-        virtual const unsigned int& get_total_dim_in_one_record();
+        [[nodiscard]] virtual const unsigned int& get_total_dim_in_one_record() const;
 
-        virtual const size_t& get_num_record();
+        [[nodiscard]] virtual const size_t& get_num_record() const;
 
     protected:
         unsigned int num_cv_dimensions;
@@ -86,7 +86,7 @@ namespace fesutils {
 
         void insertDatapointsVector(const std::vector<double>& datapoint) final;
 
-        void getDatapoint(size_t index, std::vector<double>& datapoint_buffer) final;
+        void getDatapoint(size_t index, std::vector<double>& datapoint_buffer) const final;
 
         std::vector<double> getDatapoint(size_t index) final;
 

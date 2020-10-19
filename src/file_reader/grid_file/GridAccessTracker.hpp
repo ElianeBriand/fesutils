@@ -40,10 +40,11 @@ namespace fesutils {
 
         bool all_voxel_accessed_n_times_or_less(const int n);
 
+        bool access_number_at_coord_rangechecked(const std::vector<double>& coord,
+                                                std::vector<long int>& idx_buffer,
+                                                int& result);
+
     protected:
-
-
-
         long int indices_to_globalindex(const std::vector<long int>& indices);
 
         const unsigned int num_axis;
