@@ -1,0 +1,1 @@
+* Prettify the progress indicator

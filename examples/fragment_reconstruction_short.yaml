@@ -1,0 +1,129 @@
+
+general:
+    title: "Reweight & fragment reconstruction - short file version"
+    log_level: debug
+    binary_cache_policy: always
+    ui_bling: true # Enables progress bar & co. Disable if non-interactive batch
+
+search_directory:
+    all: "./examples/"
+
+fes_data:
+    meac:
+        name: "Methylacetate"
+        cv_varnames:
+            - "fragment_position.x"
+            - "fragment_position.y"
+            - "fragment_position.z"
+        wall_bias_varnames:
+            - "wall_lower.bias"
+            - "wall_upper.bias"
+        metad_bias_varname: "metad_position.bias"
+        cv_filename_hint: "SHORT_CV_fragment_meac"
+        hills_filename_hint: "SHORT_HILLS_fragment_meac"
+    bzn:
+        name: "Benzene"
+        cv_varnames:
+            - "fragment_position.x"
+            - "fragment_position.y"
+            - "fragment_position.z"
+        wall_bias_varnames:
+            - "wall_lower.bias"
+            - "wall_upper.bias"
+        metad_bias_varname: "metad_position.bias"
+        cv_filename_hint: "SHORT_CV_fragment_benzene"
+        hills_filename_hint: "SHORT_HILLS_fragment_benzene"
+        grid_filename_hint: "SHORT_GRID_fragment_benzene"
+    pip:
+        name: "Piperidine"
+        cv_varnames:
+            - "fragment_position.x"
+            - "fragment_position.y"
+            - "fragment_position.z"
+        wall_bias_varnames:
+            - "wall_lower.bias"
+            - "wall_upper.bias"
+        metad_bias_varname: "metad_position.bias"
+        cv_filename_hint: "SHORT_CV_fragment_piperidine"
+        hills_filename_hint: "SHORT_HILLS_fragment_piperidine"
+
+block_analysis:
+    block_all:
+        method: coverage_mean
+        wall_reached: discard
+        data: [meac, bzn, pip]
+        
+reweight:
+    rw_all:
+        method: reweight_no_interp
+        wall_reached: discard
+        data: [meac, bzn, pip]
+
+histogram:
+    histo_all:
+        method: histo_no_interp
+        data: [meac, bzn, pip]
+        
+        
+reconstruction:
+    mph_1point:
+        name: "Methylphenidate (single point reconstruction)"
+        fragments: [meac, bzn, pip]
+        method: single_point
+    mph_1conformer:
+        name: "Methylphenidate (one conformer reconstruction)"
+        fragments: [meac, bzn, pip]
+        method: one_conformer
+        geometry:
+            meac: [-0.309, 0.913, 1.132]
+            bzn: [-1.374, -2.547, 0.510]
+            pip: [-0.232, 0.647, -1.416]
+    mph_multiconformer:
+        name: "Methylphenidate (multiple conformer reconstruction)"
+        fragments: [meac, bzn, pip]
+        method: multiple_conformers
+        geometry:
+            meac:
+                - [ 0.340,  1.249, -0.757]
+                - [ 0.439,  0.931,  1.091]
+                - [-0.100,  1.480,  0.244]
+                - [-0.051,  1.499, -0.100]
+                - [-1.092, -0.848, -0.569]
+                - [-0.404, -1.406,  0.346]
+                - [ 0.340,  1.440, -0.245]
+                - [ 0.740, -0.912,  0.928]
+                - [-0.353,  1.430, -0.265]
+                - [ 0.455,  1.023, -1.007]
+            bzn:
+                - [-2.220, -1.615, -1.352]
+                - [-2.682, -1.338,  0.684]
+                - [-2.319, -1.367, -1.647]
+                - [-2.381, -1.472, -1.541]
+                - [-0.868,  3.228,  1.280]
+                - [-1.868,  2.319,  1.446]
+                - [-0.637, -1.506, -2.679]
+                - [-0.221,  3.285,  0.796]
+                - [ 0.271, -2.113, -2.634]
+                - [-3.040, -0.507, -0.151]
+            pip:
+                - [ 1.197, -0.906,  0.197]
+                - [ 1.019, -1.083, -0.286]
+                - [ 1.299, -0.262, -0.740]
+                - [ 1.273, -0.433, -0.710]
+                - [ 0.773, -0.831,  0.993]
+                - [ 1.382,  0.272,  0.560]
+                - [ 1.102, -0.744,  0.725]
+                - [-1.403, -0.545, -0.164]
+                - [-1.030, -0.561,  0.957]
+                - [ 0.662, -1.348, -0.202]
+                
+
+
+### Batch steps ####
+steps:
+    - fes_data : [bzn]
+    - reweight: rw_all
+#    - histogram: histo_all
+#    - reconstruction: mph_1point
+#    - reconstruction: mph_1conformer
+#    - reconstruction: mph_multiconformer
