@@ -1,0 +1,79 @@
+name: build_CMake
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: install_deps
+      run: sudo add-apt-repository ppa:mhier/libboost-latest && \
+          sudo apt-get update && \
+          sudo apt-get install -yq g++ lcov boost1.67 libeigen3-dev libtbb-dev wget doxygen
+          
+    - name: install_recent_cmake
+      run: DEPS_DIR="${runner.workspace}/deps" && \
+          mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && \
+          wget --no-verbose --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.tar.gz && \
+          echo "85f55f13c922c853049edcf37c828b02b9b2fc00729d0cbb56cf20181a39340b *cmake-3.16.0-Linux-x86_64.tar.gz" > cmake_sha256.txt &&\
+          sha256sum -c cmake_sha256.txt && \
+          tar -xf cmake-3.16.0-Linux-x86_64.tar.gz && \
+          mv cmake-3.16.0-Linux-x86_64 cmake-install && \
+          PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH && \
+          cd ${runner.workspace}
+          
+    - name: setup_python_env
+      run: export PYTHON_EXECUTABLE=`which python3` && \
+        export PYTHON_INCLUDE_DIR=$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") && \
+        export PYTHON_LIBRARY=$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
+
+    - name: build_bundled_deps
+      run: cd bundled-deps  && \
+          mkdir build-fmt && cd build-fmt   && \
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../fmt   && \
+          make && make install   && \
+          cd ..   && \
+          mkdir build-yaml-cpp && cd build-yaml-cpp   && \
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../yaml-cpp   && \
+          make && make install   && \
+          cd ..  && \
+          mkdir build-indicators && cd build-indicators  && \
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../indicators  && \
+          make && make install  && \
+          cd ../..
+
+
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest --verbose -C $BUILD_TYPE
