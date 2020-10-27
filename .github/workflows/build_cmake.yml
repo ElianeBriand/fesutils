@@ -21,7 +21,7 @@ jobs:
           
     - name: install_recent_cmake
       run: |
-          DEPS_DIR="${runner.workspace}/deps" 
+          DEPS_DIR="${DEPS_DIR_BASE}/deps" 
           mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
           wget --no-verbose --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.tar.gz 
           echo "85f55f13c922c853049edcf37c828b02b9b2fc00729d0cbb56cf20181a39340b *cmake-3.16.0-Linux-x86_64.tar.gz" > cmake_sha256.txt
@@ -29,7 +29,9 @@ jobs:
           tar -xf cmake-3.16.0-Linux-x86_64.tar.gz 
           mv cmake-3.16.0-Linux-x86_64 cmake-install
           PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH 
-          cd ${runner.workspace}
+          cd ${DEPS_DIR_BASE}
+      env:
+       DEPS_DIR_BASE: ${{runner.workspace}}
           
     - name: setup_python_env
       run: |
