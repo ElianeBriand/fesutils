@@ -24,7 +24,7 @@
 namespace fesutils {
 
 
-    std::shared_ptr<GridAccessTracker> count_sampled_voxel_in_CVData(const CVData& cv_data,
+    std::shared_ptr<GridAccessTracker> track_sampled_voxel_in_CVData(const CVData& cv_data,
                                                                      const GridData& gridData) {
         std::shared_ptr<GridAccessTracker> gat = std::make_shared<GridAccessTracker>(gridData);
 

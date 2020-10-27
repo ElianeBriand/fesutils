@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(cv_space_coverage_ts)
 
         // TEST
 
-        std::shared_ptr<f::GridAccessTracker> gat = f::count_sampled_voxel_in_CVData(*im_cvdata, *gd);
+        std::shared_ptr<f::GridAccessTracker> gat = f::track_sampled_voxel_in_CVData(*im_cvdata, *gd);
 
         bool all_voxel_accessed_1_or_less = gat->all_voxel_accessed_n_times_or_less(1);
 

@@ -25,6 +25,11 @@
 
 
 namespace fesutils {
+    /** Transform a YAML sequence node to a vector of string with the same content
+     *
+     * \param seq_node YAML node with seq_node.IsSequence() true
+     * \return
+     */
     std::vector<std::string> string_vector_from_yaml_sequence_node(const YAML::Node& seq_node);
 }
 

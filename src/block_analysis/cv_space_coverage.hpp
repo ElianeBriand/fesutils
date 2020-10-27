@@ -27,7 +27,15 @@
 
 namespace fesutils {
 
-        std::shared_ptr<GridAccessTracker> count_sampled_voxel_in_CVData(const CVData& cv_data,
+        /** For a given grid, track which voxel are sampled by a given CV data run
+         *
+         * This is used by block analysis and coverage analysis, to know which voxels are reached in a block
+         *
+         * \param cv_data
+         * \param gridData
+         * \return
+         */
+        std::shared_ptr<GridAccessTracker> track_sampled_voxel_in_CVData(const CVData& cv_data,
                                                                          const GridData& gridData);
 
 }

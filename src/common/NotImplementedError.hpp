@@ -23,6 +23,9 @@
 #include <exception>
 #include <string>
 
+/**
+ * Exception type to signal that the code path is not implemented.
+ */
 class not_implemented_error: public std::exception
 {
 public:

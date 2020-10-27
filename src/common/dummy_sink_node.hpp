@@ -25,6 +25,10 @@
 
 namespace fesutils {
 
+    /**
+     * A TBB graph nodes that does nothing. Useful when a node is expected but a NOP is desired.
+     * \tparam T Passthrough data type
+     */
     template<typename T>
     class dummy_sink_node {
     public:

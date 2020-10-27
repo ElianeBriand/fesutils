@@ -24,6 +24,13 @@
 #include <string>
 #include <vector>
 
+/** Converts a vector of uint8_t to a string.
+ *
+ * No unicode check or anything.
+ *
+ * \param buffer vector of byte
+ * \return
+ */
 inline std::string buffer_to_string(const std::vector<uint8_t>& buffer) {
     return std::string((char*) buffer.data(), buffer.size());
 }

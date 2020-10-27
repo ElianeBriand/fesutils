@@ -24,6 +24,7 @@ addons:
       - libeigen3-dev
       - libtbb-dev
       - wget
+      - doxygen
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -61,5 +62,5 @@ script:
   - sleep 10
 after_success:
   - chmod +x ./runCoverage.sh
-  - ./runCoverage.sh -t 1 -s 1
+  - ./runCoverage.sh -t 1 -s 1 -d 0
   - sleep 10

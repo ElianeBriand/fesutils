@@ -28,8 +28,8 @@
 
 namespace fesutils {
 
-    /*
-     * Hold data related to a Plumed .dat file Field
+    /**
+     * Hold data related to a Plumed .dat file header field
      */
     struct Field {
         std::string name;

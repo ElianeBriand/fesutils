@@ -46,7 +46,7 @@ namespace fesutils {
     bf::path find_grid_path_from_hint(const GeneralOptions& options, const std::string& grid_filepath_hint) {
         bf::path p;
         p =  find_path_from_hint_in_search_directory_categories(options,
-                                                                {"grids", "all"},
+                                                                {"grid", "all"},
                                                                 grid_filepath_hint);
 
         return p;

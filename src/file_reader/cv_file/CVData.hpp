@@ -27,6 +27,12 @@
 
 namespace fesutils {
 
+    /** Abstract class that define the interface for Collective Variable (CV) storage
+     *
+     * Typically, the output of a Plumed run will generate a text file with CV data. This describe the
+     * interface of classes that can store such format.
+     *
+     */
     class CVData {
     public:
         CVData(unsigned int num_cv_dimensions_,
@@ -74,6 +80,9 @@ namespace fesutils {
 
     };
 
+    /** CV data storage kept entirely in memory
+     *
+     */
     class InMemoryCVData : public CVData {
     public:
         InMemoryCVData(unsigned int num_cv_dimensions_,
@@ -104,11 +113,25 @@ namespace fesutils {
         disk
     };
 
+    /**
+     * Factory function to generate a CVData storage object.
+     *
+     * \param cv_storage_class
+     * \param num_cv_dimensions_
+     * \param num_value_dimensions_
+     * \param expected_number_record
+     * \return
+     */
     std::shared_ptr<CVData> CVData_factory(CVData_storage_class cv_storage_class,
                                            unsigned int num_cv_dimensions_,
                                            unsigned int num_value_dimensions_,
                                            size_t expected_number_record);
 
+    /** A light span class that represents an interval/block in an underlying CV data object
+     *
+     * Useful for block analysis without dealing too much with indices offset or expensive copies.
+     *
+     */
     class CVData_span {
     public:
 

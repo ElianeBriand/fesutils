@@ -3,18 +3,18 @@
 
 There is a coverage helper script that builds and run the tests, and produces a report. 
 
-Typically, from your own machine, invoke it from the project root like this (15 is the number of thread, 0 is to not send the statistics
-to the coverage server - should only be done in CI):
+Typically, from your own machine, invoke it from the project root like this (`-t 15` is the number of thread, `-s 0` is to not send the statistics
+to the coverage server - should only be done in CI, `-d 0` is to not only run documentation coverage test):
 
 ```
-./runCoverage.sh -t 15 -s 0
+./runCoverage.sh -t 15 -s 0 -d 0
 
 ```
 
 And for subsequent build:
 
 ```
-rm -rf build_cov &&  ./runCoverage.sh -t 15 -s 0
+rm -rf build_cov &&  ./runCoverage.sh -t 15 -s 0 -d 0
 ```
 
 The build_cov directory is in the .gitignore so it is fine to leave this directory alone in between coverage build.
@@ -57,3 +57,14 @@ would be useful.
 
 The string `Reason for coverage exclusion:` should be kept intact for ease of grep-ing.
 
+# Documentation coverage
+
+To run the documentation coverage only:
+
+```
+./runCoverage.sh -t 15 -s 0 -d 1
+```
+
+This outputs a summary of the doxygen-document parts of the code.
+
+No specific policy - for information purpose only, though making it higher is always appreciated.

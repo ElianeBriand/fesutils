@@ -24,6 +24,14 @@
 #include "../GeneralOptions.h"
 
 namespace fesutils {
+    /**
+     * Run the fes_data step for a given parameter name. (parameters are fetched from the global store which is filled during
+     * parsing of the runfile)
+     *
+     * \param options options for the run
+     * \param parameter_set_name label of the parameter set in the runfile
+     * \return true if the step completed without error
+     */
     bool run_fes_data_step(GeneralOptions options, const std::string& parameter_set_name);
 }
 
