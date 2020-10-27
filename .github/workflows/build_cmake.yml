@@ -14,39 +14,43 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: install_deps
-      run: sudo add-apt-repository ppa:mhier/libboost-latest && \
-          sudo apt-get update && \
+      run: |
+          sudo add-apt-repository ppa:mhier/libboost-latest
+          sudo apt-get update
           sudo apt-get install -yq g++ lcov boost1.67 libeigen3-dev libtbb-dev wget doxygen
           
     - name: install_recent_cmake
-      run: DEPS_DIR="${runner.workspace}/deps" && \
-          mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && \
-          wget --no-verbose --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.tar.gz && \
-          echo "85f55f13c922c853049edcf37c828b02b9b2fc00729d0cbb56cf20181a39340b *cmake-3.16.0-Linux-x86_64.tar.gz" > cmake_sha256.txt &&\
-          sha256sum -c cmake_sha256.txt && \
-          tar -xf cmake-3.16.0-Linux-x86_64.tar.gz && \
-          mv cmake-3.16.0-Linux-x86_64 cmake-install && \
-          PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH && \
+      run: |
+          DEPS_DIR="${runner.workspace}/deps" 
+          mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+          wget --no-verbose --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.tar.gz 
+          echo "85f55f13c922c853049edcf37c828b02b9b2fc00729d0cbb56cf20181a39340b *cmake-3.16.0-Linux-x86_64.tar.gz" > cmake_sha256.txt
+          sha256sum -c cmake_sha256.txt
+          tar -xf cmake-3.16.0-Linux-x86_64.tar.gz 
+          mv cmake-3.16.0-Linux-x86_64 cmake-install
+          PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH 
           cd ${runner.workspace}
           
     - name: setup_python_env
-      run: export PYTHON_EXECUTABLE=`which python3` && \
-        export PYTHON_INCLUDE_DIR=$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") && \
+      run: |
+        export PYTHON_EXECUTABLE=`which python3`
+        export PYTHON_INCLUDE_DIR=$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")
         export PYTHON_LIBRARY=$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
 
     - name: build_bundled_deps
-      run: cd bundled-deps  && \
-          mkdir build-fmt && cd build-fmt   && \
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../fmt   && \
-          make && make install   && \
-          cd ..   && \
-          mkdir build-yaml-cpp && cd build-yaml-cpp   && \
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../yaml-cpp   && \
-          make && make install   && \
-          cd ..  && \
-          mkdir build-indicators && cd build-indicators  && \
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../indicators  && \
-          make && make install  && \
+      run:  |
+          cd bundled-deps 
+          mkdir build-fmt && cd build-fmt  
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../fmt  
+          make && make install   
+          cd ..   
+          mkdir build-yaml-cpp && cd build-yaml-cpp  
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../yaml-cpp   
+          make && make install  
+          cd .. 
+          mkdir build-indicators && cd build-indicators  
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../deps-install ../indicators  
+          make && make install  
           cd ../..
 
 
