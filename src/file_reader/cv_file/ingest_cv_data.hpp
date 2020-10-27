@@ -29,6 +29,17 @@ namespace bf = boost::filesystem;
 #include "CVData.hpp"
 
 namespace fesutils {
+    /** High level function to read and fill a CVData object from a CV text file
+     *
+     * \param options
+     * \param cv_file_path
+     * \param cv_data_container
+     * \param cv_file_header
+     * \param cv_varnames
+     * \param metad_bias_varname
+     * \param other_values_varnames
+     * \return
+     */
     bool ingest_cv_data(const GeneralOptions& options,
                         const bf::path& cv_file_path,
                         std::shared_ptr<CVData> cv_data_container,
@@ -37,6 +48,22 @@ namespace fesutils {
                         const std::string& metad_bias_varname,
                         const std::vector<std::string>& other_values_varnames);
 
+    /** Helper function for ingest_cv_data that does fast read from a bindump file instead of the original text file
+     *
+     * \param options
+     * \param cv_file_path
+     * \param cv_data_container
+     * \param cv_file_header
+     * \param cv_varnames
+     * \param metad_bias_varname
+     * \param other_values_varnames
+     * \param cv_vars_idx
+     * \param metad_bias_var_idx
+     * \param other_vars_idx
+     * \param bindump_path
+     * \return
+     * \sa ingest_cv_data
+     */
     bool ingest_cv_data_from_bindump(const GeneralOptions& options,
                         const bf::path& cv_file_path,
                         std::shared_ptr<CVData> cv_data_container,
@@ -49,6 +76,20 @@ namespace fesutils {
                         const std::vector<size_t>& other_vars_idx,
                         const bf::path& bindump_path);
 
+    /** Helper function for ingest_cv_data that reads from a CV data text file
+     *
+     * \param options
+     * \param cv_file_path
+     * \param cv_data_container
+     * \param cv_file_header
+     * \param cv_varnames
+     * \param metad_bias_varname
+     * \param other_values_varnames
+     * \param cv_vars_idx
+     * \param metad_bias_var_idx
+     * \param other_vars_idx
+     * \return
+     */
     bool ingest_cv_data_from_originalfile(const GeneralOptions& options,
                                      const bf::path& cv_file_path,
                                      std::shared_ptr<CVData> cv_data_container,

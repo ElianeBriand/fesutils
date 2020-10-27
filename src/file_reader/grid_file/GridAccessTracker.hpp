@@ -31,6 +31,12 @@ namespace fesutils {
 
     class GridData;
 
+    /** Helper object to track access to each individual voxel of a GridData voxel
+     *
+     * Used for block analysis, and post-hoc verification that multithreaded loading of a grid file was legitimate
+     * (no multiple access to the same voxel)
+     *
+     */
     class GridAccessTracker {
     public:
         explicit GridAccessTracker(const GridData& grid);

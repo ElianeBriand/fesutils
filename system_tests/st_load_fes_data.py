@@ -5,11 +5,13 @@ import os
 
 from st_utils import save_pretest_state, get_fesutils_binary_path, move_to_root, restore_pretest_state, restore_pretest_state
 
+print("systemtest_load_fes_data")
 
 state = save_pretest_state()
 fesutil_bin_path = get_fesutils_binary_path(state)
 move_to_root()
 
+print("Running...")
 
 process = subprocess.Popen([fesutil_bin_path, 'examples/systemtest_load_fes_data.yaml'],
                            stdout=subprocess.PIPE,

@@ -29,7 +29,11 @@
 
 namespace fesutils {
 
-
+    /** A TBB graph node that takes parsed double data and fills a CVData object with it
+     *
+     * The parameters indicates which field of the parsed double data corresponds to which fields of the CVData object
+     *
+     */
     class CVData_filler_node {
     public:
 

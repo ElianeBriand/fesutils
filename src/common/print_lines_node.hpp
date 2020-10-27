@@ -25,6 +25,9 @@
 #include <vector>
 
 namespace fesutils {
+    /**
+     * A simple tbb graph node used for debugging purpose, dumps the vector of string to stdout
+     */
     class print_lines_node {
     public:
 

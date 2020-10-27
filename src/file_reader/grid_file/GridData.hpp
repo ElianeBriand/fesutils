@@ -38,6 +38,11 @@ namespace fesutils {
                                               const std::vector<std::tuple<double, double>>& axis_range_minmax,
                                               const std::vector<double>& bin_width_per_axis);
 
+    /** Abstract class describing the interface for the Grid storage facility.
+     *
+     * Plumed can output metadynamics grid - this class describe the interface to store and interact with them.
+     *
+     */
     class GridData {
     public:
         GridData(unsigned int num_axis,
@@ -100,7 +105,9 @@ namespace fesutils {
 
     };
 
-
+    /** GridData kept entirely in memory
+     *
+     */
     class InMemoryGridData : public GridData {
     public:
         InMemoryGridData(unsigned int num_axis,
@@ -124,6 +131,16 @@ namespace fesutils {
         inmemory
     };
 
+    /** Factory function to generate a GridData storage object.
+     *
+     * \param grid_storage_class
+     * \param num_axis
+     * \param bins_per_axis
+     * \param min_bin_value_per_axis
+     * \param max_bin_value_per_axis
+     * \param track_write_access_number
+     * \return
+     */
     std::shared_ptr<GridData> GridData_factory(GridData_storage_class grid_storage_class,
                                              unsigned int num_axis,
                                              std::vector<unsigned int> bins_per_axis,

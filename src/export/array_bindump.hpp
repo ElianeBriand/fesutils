@@ -26,7 +26,14 @@ namespace bf = boost::filesystem;
 
 namespace fesutils {
 
-
+    /** Check if an adequate bindump file exists for the given text file path
+     *
+     * This check for existence, but also format of the file (header, version), as well as the
+     * original file size as recorded in the header (simple heuristic for file change)
+     *
+     * \param path
+     * \return
+     */
     std::optional<bf::path> corresponding_bindump_exists(const bf::path& path);
 
 }

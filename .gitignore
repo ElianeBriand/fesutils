@@ -18,3 +18,4 @@ bundled-deps/build-*
 
 examples/GRID_*
 Testing/
+docs/doxygen

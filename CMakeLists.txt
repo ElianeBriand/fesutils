@@ -209,7 +209,6 @@ set(TEST_SOURCE_LIST
         src/unit_tests/file_reader/parse_space_separated_values_ts.cpp
         src/unit_tests/MiscFixture.cpp
         src/unit_tests/MiscFixture.hpp
-        src/unit_tests/common/misc_ts.cpp
         src/unit_tests/progress/progress_printer_ts.cpp
         src/unit_tests/file_reader/field_function_heuristics_ts.cpp
         src/unit_tests/TempDirectory.cpp
